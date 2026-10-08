@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INA-Edutour | Hybrid Edutourism Platform</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="An interactive web-based hybrid edutourism platform for Indonesian tourism polytechnics. Connects virtual preparation, map explorer with 360° views, and post-tour student reflections.">
+  <meta name="keywords" content="Edutourism, Tourism Polytechnics Indonesia, NHI Bandung, Bali, Makassar, Medan, Lombok, Palembang, Virtual Tour, Subak, Geopark">
+  <meta name="author" content="Indonesian Tourism Polytechnics Group">
+
+  <!-- Favicon Mock -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌋</text></svg>">
+
+  <!-- Leaflet Map CSS from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+        crossorigin=""/>
+
+  <!-- Global Application Styling Custom Sheet -->
+  <link rel="stylesheet" href="./style.css?v=2.1">
+</head>
+<body>
+
+  <!-- Root Application Container -->
+  <div id="app"></div>
+
+  <!-- Leaflet Map JS from CDN -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+          crossorigin=""></script>
+
+  <!-- Supabase JS Client SDK from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabaseClient.js?v=2.1"></script>
+
+  <!-- Static Data Store -->
+  <script src="./data.js?v=2.1"></script>
+
+  <!-- ES6 App Logic Entrypoint with Cache-Buster -->
+  <script src="./app.js?v=2.1"></script>
+
+</body>
+</html>
