@@ -533,18 +533,135 @@ button, input, select, textarea {
   margin-top: 0.25rem;
 }
 
+/* ============================================================= */
+/* BALINESE CULTURAL MOTIFS & THEMED BACKGROUND WRAPPERS         */
+/* ============================================================= */
+.landing-section-wrapper {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 1. Featured Bali Showcase Section - Balinese Rice Terraces Parallax & Floral Motif */
+.bali-showcase-section-wrap {
+  background-color: #faf7f2;
+  background-image: 
+    linear-gradient(180deg, rgba(250, 247, 242, 0.93) 0%, rgba(254, 243, 199, 0.28) 50%, rgba(250, 247, 242, 0.95) 100%),
+    url('https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=1920&q=70');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  border-top: 1px solid rgba(226, 232, 240, 0.75);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.75);
+  position: relative;
+}
+
+/* 2. VR Showcase Section - Translucent Sacred Gapura Pattern */
+.vr-showcase-section-wrap {
+  background-color: #0b1a30;
+  background-image: 
+    radial-gradient(circle at 10% 10%, rgba(249, 115, 22, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 90% 90%, rgba(2, 132, 199, 0.15) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M40 0c6 10 14 14 24 14-10 6-14 14-14 26-6-10-14-14-24-14 10-6 14-14 14-26z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 3. Smart Tourism Pillars - Balinese Floral Stone Carving & Candi Watermark */
+.smart-pillars-section-wrap {
+  background-color: #faf6f0;
+  background-image: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 243, 199, 0.35) 100%),
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c2593f' fill-opacity='0.045' fill-rule='evenodd'%3E%3Cpath d='M40 0c6 10 14 14 24 14-10 6-14 14-14 26-6-10-14-14-24-14 10-6 14-14 14-26zm0 80c6-10 14-14 24-14-10-6-14-14-14-26-6 10-14 14-24 14 10 6 14 14 14 26zm40-40c-10 6-14 14-14 24-6-10-14-14-26-14 10-6 14-14 14-24 6 10 14 14 26 14zm-80 0c10 6 14 14 14 24 6-10 14-14 26-14-10-6-14-14-14-24-6 10-14 14-26 14z'/%3E%3Ccircle cx='40' cy='40' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+}
+
+.smart-pillars-section-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 15px;
+  width: 320px;
+  height: 320px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500' fill='%23c2593f' opacity='0.05'%3E%3Cpath d='M250 40 L230 70 L240 70 L220 110 L235 110 L210 160 L230 160 L195 230 L225 230 L180 320 L220 320 L160 440 L245 440 L245 500 L255 500 L255 440 L340 440 L280 320 L320 320 L275 230 L305 230 L270 160 L290 160 L265 110 L280 110 L260 70 L270 70 Z M90 220 L75 250 L85 250 L65 300 L80 300 L55 370 L75 370 L40 450 L120 450 L120 500 L130 500 L130 450 L150 450 L120 370 L140 370 L115 300 L130 300 L105 250 L115 250 Z M410 220 L395 250 L405 250 L385 300 L400 300 L375 370 L395 370 L360 450 L440 450 L440 500 L450 500 L450 450 L470 450 L440 370 L460 370 L435 300 L450 300 L425 250 L435 250 Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  background-size: contain;
+  pointer-events: none;
+}
+
+/* 4. Role Selection - Balinese Customary Motif Wrapper */
+.roles-section-wrap {
+  background-color: #f7f4ee;
+  background-image: 
+    radial-gradient(circle at 15% 25%, rgba(194, 89, 63, 0.07) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(46, 139, 124, 0.07) 0%, transparent 45%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c2593f' fill-opacity='0.035' fill-rule='evenodd'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z'/%3E%3C/g%3E%3C/svg%3E");
+  padding: 5rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+}
+
+/* 5. Campuses Section - Indonesian Emerald Archipelagic Flora Watermark */
+.campuses-section-wrap {
+  background-color: #f8faf8;
+  background-image: 
+    linear-gradient(180deg, #faf7f2 0%, rgba(240, 253, 244, 0.5) 100%),
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23059669' fill-opacity='0.035' fill-rule='evenodd'%3E%3Cpath d='M40 0c6 10 14 14 24 14-10 6-14 14-14 26-6-10-14-14-24-14 10-6 14-14 14-26z'/%3E%3Ccircle cx='40' cy='40' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+}
+
+/* 6. Methodology Section - Balinese Stone Carving Texture */
+.methodology-section-wrap {
+  background-color: #faf7f3;
+  background-image: 
+    linear-gradient(180deg, #f8faf8 0%, rgba(254, 243, 199, 0.3) 100%),
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23b45309' fill-opacity='0.035' fill-rule='evenodd'%3E%3Cpath d='M40 0c6 10 14 14 24 14-10 6-14 14-14 26-6-10-14-14-24-14 10-6 14-14 14-26z'/%3E%3C/g%3E%3C/svg%3E");
+  border-bottom: 1px solid #e7e5e4;
+  position: relative;
+}
+
+/* 7. Testimonials Section - Sacred Temple Watermark & Golden Glow */
+.testimonials-section-wrap {
+  background-color: #fdfaf6;
+  background-image: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 243, 199, 0.4) 100%),
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c2593f' fill-opacity='0.045' fill-rule='evenodd'%3E%3Cpath d='M40 0c6 10 14 14 24 14-10 6-14 14-14 26-6-10-14-14-24-14 10-6 14-14 14-26zm0 80c6-10 14-14 24-14-10-6-14-14-14-26-6 10-14 14-24 14 10 6 14 14 14 26z'/%3E%3C/g%3E%3C/svg%3E");
+  position: relative;
+}
+
+.testimonials-section-wrap::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  width: 300px;
+  height: 300px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500' fill='%23c2593f' opacity='0.045'%3E%3Cpath d='M250 40 L230 70 L240 70 L220 110 L235 110 L210 160 L230 160 L195 230 L225 230 L180 320 L220 320 L160 440 L245 440 L245 500 L255 500 L255 440 L340 440 L280 320 L320 320 L275 230 L305 230 L270 160 L290 160 L265 110 L280 110 L260 70 L270 70 Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: bottom left;
+  background-size: contain;
+  pointer-events: none;
+}
+
 /* Sections Common Layout */
 .landing-section {
   padding: 5rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-section-header {
   text-align: center;
   max-width: 780px;
   margin: 0 auto 3.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-section-pill {
@@ -1076,13 +1193,30 @@ button, input, select, textarea {
 
 /* Role Selection Cards */
 .roles-wrapper {
-  background: #ffffff;
-  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 28px;
   padding: 3.5rem 2.5rem;
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
-  border: 1px solid var(--border-color);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.05);
+  border: 1.5px solid rgba(226, 232, 240, 0.95);
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.roles-wrapper::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  right: -30px;
+  width: 280px;
+  height: 280px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500' fill='%23c2593f' opacity='0.05'%3E%3Cpath d='M250 40 L230 70 L240 70 L220 110 L235 110 L210 160 L230 160 L195 230 L225 230 L180 320 L220 320 L160 440 L245 440 L245 500 L255 500 L255 440 L340 440 L280 320 L320 320 L275 230 L305 230 L270 160 L290 160 L265 110 L280 110 L260 70 L270 70 Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
 }
 
 .welcome-grid {
@@ -1090,12 +1224,16 @@ button, input, select, textarea {
   grid-template-columns: repeat(3, 1fr);
   gap: 1.75rem;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
   padding: 2.25rem 1.75rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);

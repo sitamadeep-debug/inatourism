@@ -364,171 +364,177 @@ function renderWelcomeScreen(container) {
       </header>
 
       <!-- 3. Featured Bali Edutourism Showcase with Interactive Category Filters -->
-      <section class="landing-section" id="bali-showcase">
-        <div class="landing-section-header">
-          <span class="landing-section-pill">🌴 ${isId ? 'Edisi Spesial Poltekpar Bali' : 'Special Edition Poltekpar Bali'}</span>
-          <h2>${t('bali_section_title')}</h2>
-          <p>${t('bali_section_sub')}</p>
+      <section class="landing-section-wrapper bali-showcase-section-wrap" id="bali-showcase">
+        <div class="landing-section">
+          <div class="landing-section-header">
+            <span class="landing-section-pill">🌴 ${isId ? 'Edisi Spesial Poltekpar Bali' : 'Special Edition Poltekpar Bali'}</span>
+            <h2>${t('bali_section_title')}</h2>
+            <p>${t('bali_section_sub')}</p>
 
-          <!-- Interactive Category Filter Tabs -->
-          <div class="dest-filter-tabs">
-            <button class="dest-filter-btn active" data-filter="all">✨ ${isId ? 'Semua Destinasi (6)' : 'All Destinations (6)'}</button>
-            <button class="dest-filter-btn" data-filter="heritage">🏛️ ${isId ? 'Warisan Budaya & Pura (3)' : 'Cultural Heritage (3)'}</button>
-            <button class="dest-filter-btn" data-filter="nature">🌾 ${isId ? 'UNESCO Alam & Geowisata (2)' : 'Nature & Geotourism (2)'}</button>
-            <button class="dest-filter-btn" data-filter="community">🏡 ${isId ? 'Desa Adat Berkelanjutan (1)' : 'Eco-Village CBT (1)'}</button>
+            <!-- Interactive Category Filter Tabs -->
+            <div class="dest-filter-tabs">
+              <button class="dest-filter-btn active" data-filter="all">✨ ${isId ? 'Semua Destinasi (6)' : 'All Destinations (6)'}</button>
+              <button class="dest-filter-btn" data-filter="heritage">🏛️ ${isId ? 'Warisan Budaya & Pura (3)' : 'Cultural Heritage (3)'}</button>
+              <button class="dest-filter-btn" data-filter="nature">🌾 ${isId ? 'UNESCO Alam & Geowisata (2)' : 'Nature & Geotourism (2)'}</button>
+              <button class="dest-filter-btn" data-filter="community">🏡 ${isId ? 'Desa Adat Berkelanjutan (1)' : 'Eco-Village CBT (1)'}</button>
+            </div>
           </div>
-        </div>
 
-        <div class="bali-dest-grid" id="bali-cards-grid">
-          ${baliDests.map(dest => {
-            const meta = BALI_META[dest.id] || {
-              category: "heritage",
-              location: "Bali, Indonesia",
-              tag: "Edutourism Spot",
-              rating: "4.9",
-              reviews: "1.5k",
-              duration: "2-3 Jam",
-              distance: "1j 30m dari Kuta",
-              highlights: ["Pemandangan Indah", "Budaya Khas", "Riset Ilmiah"],
-              focus: getLocalized(dest.description)
-            };
-            const desc = getLocalized(dest.description);
+          <div class="bali-dest-grid" id="bali-cards-grid">
+            ${baliDests.map(dest => {
+              const meta = BALI_META[dest.id] || {
+                category: "heritage",
+                location: "Bali, Indonesia",
+                tag: "Edutourism Spot",
+                rating: "4.9",
+                reviews: "1.5k",
+                duration: "2-3 Jam",
+                distance: "1j 30m dari Kuta",
+                highlights: ["Pemandangan Indah", "Budaya Khas", "Riset Ilmiah"],
+                focus: getLocalized(dest.description)
+              };
+              const desc = getLocalized(dest.description);
 
-            return `
-              <div class="bali-dest-card" data-dest-id="${dest.id}" data-category="${meta.category}">
-                <div class="bali-dest-img-wrap">
-                  <img src="${dest.panorama}" alt="${dest.name}" class="bali-dest-img" loading="lazy" />
-                  <span class="bali-dest-tag">${meta.tag}</span>
-                  <div class="bali-dest-top-badges">
-                    <span class="bali-dest-rating">⭐ ${meta.rating} (${meta.reviews})</span>
+              return `
+                <div class="bali-dest-card" data-dest-id="${dest.id}" data-category="${meta.category}">
+                  <div class="bali-dest-img-wrap">
+                    <img src="${dest.panorama}" alt="${dest.name}" class="bali-dest-img" loading="lazy" />
+                    <span class="bali-dest-tag">${meta.tag}</span>
+                    <div class="bali-dest-top-badges">
+                      <span class="bali-dest-rating">⭐ ${meta.rating} (${meta.reviews})</span>
+                    </div>
+                    <span class="bali-dest-location">📍 ${meta.location} • 🚗 ${meta.distance}</span>
                   </div>
-                  <span class="bali-dest-location">📍 ${meta.location} • 🚗 ${meta.distance}</span>
+                  <div class="bali-dest-body">
+                    <h3>${dest.name}</h3>
+                    <p>${desc}</p>
+                    
+                    <!-- Highlight Pills -->
+                    <div class="bali-dest-highlights">
+                      ${meta.highlights.map(h => `<span class="highlight-pill">${h}</span>`).join('')}
+                    </div>
+
+                    <div class="bali-dest-focus-box">
+                      <strong>🎓 ${isId ? 'Fokus Studi Lapangan' : 'Study Focus'}:</strong> ${meta.focus}
+                    </div>
+
+                    <!-- Dual Action Buttons -->
+                    <div class="bali-card-actions">
+                      <button class="bali-dest-action-btn bali-btn-360" data-dest-id="${dest.id}" data-action="360" title="${isId ? 'Masuk ke Tur Virtual 360°' : 'Enter 360° Virtual Tour'}">
+                        <span>🕶️ ${isId ? 'Tur 360°' : '360° Tour'}</span>
+                      </button>
+                      <button class="bali-dest-action-btn bali-btn-route" data-dest-id="${dest.id}" data-action="route" title="${isId ? 'Lihat Peta Rute & Kondisi Jalan' : 'View Map & Route'}">
+                        <span>🗺️ ${isId ? 'Peta Rute' : 'Route Map'}</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div class="bali-dest-body">
-                  <h3>${dest.name}</h3>
-                  <p>${desc}</p>
-                  
-                  <!-- Highlight Pills -->
-                  <div class="bali-dest-highlights">
-                    ${meta.highlights.map(h => `<span class="highlight-pill">${h}</span>`).join('')}
-                  </div>
-
-                  <div class="bali-dest-focus-box">
-                    <strong>🎓 ${isId ? 'Fokus Studi Lapangan' : 'Study Focus'}:</strong> ${meta.focus}
-                  </div>
-
-                  <!-- Dual Action Buttons -->
-                  <div class="bali-card-actions">
-                    <button class="bali-dest-action-btn bali-btn-360" data-dest-id="${dest.id}" data-action="360" title="${isId ? 'Masuk ke Tur Virtual 360°' : 'Enter 360° Virtual Tour'}">
-                      <span>🕶️ ${isId ? 'Tur 360°' : '360° Tour'}</span>
-                    </button>
-                    <button class="bali-dest-action-btn bali-btn-route" data-dest-id="${dest.id}" data-action="route" title="${isId ? 'Lihat Peta Rute & Kondisi Jalan' : 'View Map & Route'}">
-                      <span>🗺️ ${isId ? 'Peta Rute' : 'Route Map'}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('')}
+              `;
+            }).join('')}
+          </div>
         </div>
       </section>
 
       <!-- 4. NEW: Cinematic 360° VR & Spatial Tourism Experience Showcase -->
-      <section class="landing-section" id="vr-showcase-section" style="padding-top: 2rem;">
-        <div class="vr-banner-card">
-          <div class="vr-banner-content">
-            <span class="landing-section-pill" style="background: rgba(254, 240, 138, 0.2); color: #fef08a; border: 1px solid rgba(254, 240, 138, 0.4);">
-              🕶️ ${isId ? 'Realitas Virtual Beresolusi Tinggi' : 'Ultra-HD Virtual Reality'}
-            </span>
-            <h2>${isId ? 'Rasakan Sensasi Berdiri di Tebing Uluwatu Setinggi 97 Meter' : 'Experience Standing Atop the 97m Uluwatu Cliff'}</h2>
-            <p>${isId 
-              ? 'Sebelum terjun langsung ke lapangan, mahasiswa dan peneliti dapat mengobservasi tata ruang pura, deburan ombak Samudera Hindia, dan relief arsitektur sakral melalui navigasi panorama 360° yang imersif dan dilengkapi narasi audio pemandu.' 
-              : 'Before on-site fieldwork, researchers and students can examine spatial temple zoning, Indian Ocean wave dynamics, and sacred reliefs through an immersive 360° panoramic viewer with curated audio guides.'}</p>
-            
-            <div class="vr-feature-chips">
-              <div class="vr-chip">
-                <span class="chip-icon">🧭</span>
-                <div>
-                  <strong>${isId ? 'Navigasi 360 Derajat Bebas' : 'Free 360° Navigation'}</strong>
-                  <p>${isId ? 'Putar ke segala arah dengan kontrol intuitif' : 'Pan in all directions with responsive controls'}</p>
+      <section class="landing-section-wrapper vr-showcase-section-wrap" id="vr-showcase-section">
+        <div class="landing-section" style="padding-top: 2rem; padding-bottom: 2rem;">
+          <div class="vr-banner-card">
+            <div class="vr-banner-content">
+              <span class="landing-section-pill" style="background: rgba(254, 240, 138, 0.2); color: #fef08a; border: 1px solid rgba(254, 240, 138, 0.4);">
+                🕶️ ${isId ? 'Realitas Virtual Beresolusi Tinggi' : 'Ultra-HD Virtual Reality'}
+              </span>
+              <h2>${isId ? 'Rasakan Sensasi Berdiri di Tebing Uluwatu Setinggi 97 Meter' : 'Experience Standing Atop the 97m Uluwatu Cliff'}</h2>
+              <p>${isId 
+                ? 'Sebelum terjun langsung ke lapangan, mahasiswa dan peneliti dapat mengobservasi tata ruang pura, deburan ombak Samudera Hindia, dan relief arsitektur sakral melalui navigasi panorama 360° yang imersif dan dilengkapi narasi audio pemandu.' 
+                : 'Before on-site fieldwork, researchers and students can examine spatial temple zoning, Indian Ocean wave dynamics, and sacred reliefs through an immersive 360° panoramic viewer with curated audio guides.'}</p>
+              
+              <div class="vr-feature-chips">
+                <div class="vr-chip">
+                  <span class="chip-icon">🧭</span>
+                  <div>
+                    <strong>${isId ? 'Navigasi 360 Derajat Bebas' : 'Free 360° Navigation'}</strong>
+                    <p>${isId ? 'Putar ke segala arah dengan kontrol intuitif' : 'Pan in all directions with responsive controls'}</p>
+                  </div>
+                </div>
+                <div class="vr-chip">
+                  <span class="chip-icon">🎧</span>
+                  <div>
+                    <strong>${isId ? 'Audio Pemandu Lapangan' : 'Audio Field Guide'}</strong>
+                    <p>${isId ? 'Narasi kuratorial dwibahasa terverifikasi dosen' : 'Curated bilingual field narration'}</p>
+                  </div>
+                </div>
+                <div class="vr-chip">
+                  <span class="chip-icon">📐</span>
+                  <div>
+                    <strong>${isId ? 'Koordinat GPS Spasial' : 'Spatial GPS Coordinates'}</strong>
+                    <p>${isId ? 'Terhubung langsung dengan titik peta presisi' : 'Directly synchronized with live map coordinates'}</p>
+                  </div>
                 </div>
               </div>
-              <div class="vr-chip">
-                <span class="chip-icon">🎧</span>
-                <div>
-                  <strong>${isId ? 'Audio Pemandu Lapangan' : 'Audio Field Guide'}</strong>
-                  <p>${isId ? 'Narasi kuratorial dwibahasa terverifikasi dosen' : 'Curated bilingual field narration'}</p>
-                </div>
-              </div>
-              <div class="vr-chip">
-                <span class="chip-icon">📐</span>
-                <div>
-                  <strong>${isId ? 'Koordinat GPS Spasial' : 'Spatial GPS Coordinates'}</strong>
-                  <p>${isId ? 'Terhubung langsung dengan titik peta presisi' : 'Directly synchronized with live map coordinates'}</p>
-                </div>
-              </div>
-            </div>
 
-            <button class="vr-banner-cta-btn" id="vr-teaser-btn">
-              <span>🕶️ ${isId ? 'Buka Tur Virtual 360° Sekarang' : 'Launch 360° Virtual Tour'}</span> →
-            </button>
-          </div>
-          <div class="vr-banner-visual">
-            <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80" alt="360 Preview" class="vr-visual-img" />
-            <div class="vr-compass-badge">
-              <span class="compass-ring"></span>
-              <span class="compass-icon">🧭</span>
-              <span class="compass-text">360° INTERACTIVE</span>
+              <button class="vr-banner-cta-btn" id="vr-teaser-btn">
+                <span>🕶️ ${isId ? 'Buka Tur Virtual 360° Sekarang' : 'Launch 360° Virtual Tour'}</span> →
+              </button>
+            </div>
+            <div class="vr-banner-visual">
+              <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80" alt="360 Preview" class="vr-visual-img" />
+              <div class="vr-compass-badge">
+                <span class="compass-ring"></span>
+                <span class="compass-icon">🧭</span>
+                <span class="compass-text">360° INTERACTIVE</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       <!-- 5. NEW: 5 Smart Tourism Pillars Section -->
-      <section class="landing-section" id="smart-pillars">
-        <div class="landing-section-header">
-          <span class="landing-section-pill" style="background: #e0e7ff; color: #4338ca;">✨ ${isId ? 'Keunggulan Platform' : 'Core Innovations'}</span>
-          <h2>${isId ? '5 Pilar Pariwisata & Edukasi Cerdas' : '5 Pillars of Smart Hybrid Edutourism'}</h2>
-          <p>${isId 
-            ? 'Platform INA-Edutour dibangun khusus untuk memenuhi kebutuhan riset, observasi lapangan, dan standar penilaian akademik Kementerian Pariwisata dan Ekonomi Kreatif RI.' 
-            : 'The INA-Edutour platform is specifically designed to meet rigorous fieldwork research and academic accreditation standards.'}</p>
-        </div>
-
-        <div class="smart-pillars-grid">
-          <div class="pillar-card">
-            <div class="pillar-icon-box" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">🕶️</div>
-            <h3>${isId ? 'Tur Virtual 360° & VR' : '360° Virtual Reality'}</h3>
-            <p>${isId ? 'Simulasi spasial lokasi wisata sebelum kunjungan fisik, memungkinkan analisis awal morfologi dan carrying capacity.' : 'Photorealistic spatial preview of destinations for pre-fieldwork analysis.'}</p>
+      <section class="landing-section-wrapper smart-pillars-section-wrap" id="smart-pillars">
+        <div class="landing-section">
+          <div class="landing-section-header">
+            <span class="landing-section-pill" style="background: #e0e7ff; color: #4338ca;">✨ ${isId ? 'Keunggulan Platform' : 'Core Innovations'}</span>
+            <h2>${isId ? '5 Pilar Pariwisata & Edukasi Cerdas' : '5 Pillars of Smart Hybrid Edutourism'}</h2>
+            <p>${isId 
+              ? 'Platform INA-Edutour dibangun khusus untuk memenuhi kebutuhan riset, observasi lapangan, dan standar penilaian akademik Kementerian Pariwisata dan Ekonomi Kreatif RI.' 
+              : 'The INA-Edutour platform is specifically designed to meet rigorous fieldwork research and academic accreditation standards.'}</p>
           </div>
 
-          <div class="pillar-card">
-            <div class="pillar-icon-box" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">🚦</div>
-            <h3>${isId ? 'Rute Multi-Modal & Macet' : 'Multi-Modal Live Traffic'}</h3>
-            <p>${isId ? 'Perhitungan rute realistis untuk Mobil, Kereta/Bus, Sepeda Motor, dan Jalan Kaki dengan kondisi kepadatan jalan real-time.' : 'Multi-modal route engine with real-world traffic delay modeling and turn-by-turn simulation.'}</p>
-          </div>
+          <div class="smart-pillars-grid">
+            <div class="pillar-card">
+              <div class="pillar-icon-box" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">🕶️</div>
+              <h3>${isId ? 'Tur Virtual 360° & VR' : '360° Virtual Reality'}</h3>
+              <p>${isId ? 'Simulasi spasial lokasi wisata sebelum kunjungan fisik, memungkinkan analisis awal morfologi dan carrying capacity.' : 'Photorealistic spatial preview of destinations for pre-fieldwork analysis.'}</p>
+            </div>
 
-          <div class="pillar-card">
-            <div class="pillar-icon-box" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">🎧</div>
-            <h3>${isId ? 'Audio Pemandu Lapangan' : 'Audio Guiding System'}</h3>
-            <p>${isId ? 'Narasi audio dwibahasa (ID/EN) yang mendalam untuk memandu observasi mandiri mahasiswa di setiap titik koordinat.' : 'Bilingual curator voiceovers guiding on-site self-directed field observations.'}</p>
-          </div>
+            <div class="pillar-card">
+              <div class="pillar-icon-box" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">🚦</div>
+              <h3>${isId ? 'Rute Multi-Modal & Macet' : 'Multi-Modal Live Traffic'}</h3>
+              <p>${isId ? 'Perhitungan rute realistis untuk Mobil, Kereta/Bus, Sepeda Motor, dan Jalan Kaki dengan kondisi kepadatan jalan real-time.' : 'Multi-modal route engine with real-world traffic delay modeling and turn-by-turn simulation.'}</p>
+            </div>
 
-          <div class="pillar-card">
-            <div class="pillar-icon-box" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">📝</div>
-            <h3>${isId ? 'Jurnal Riset & Rubrik Dosen' : 'Rubric Evaluation Journal'}</h3>
-            <p>${isId ? 'Pengumpulan tugas refleksi lapangan terstruktur dengan penilaian rubrik objektif oleh dosen pembimbing.' : 'Structured field journal reflections graded against standardized pedagogical rubrics.'}</p>
-          </div>
+            <div class="pillar-card">
+              <div class="pillar-icon-box" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">🎧</div>
+              <h3>${isId ? 'Audio Pemandu Lapangan' : 'Audio Guiding System'}</h3>
+              <p>${isId ? 'Narasi audio dwibahasa (ID/EN) yang mendalam untuk memandu observasi mandiri mahasiswa di setiap titik koordinat.' : 'Bilingual curator voiceovers guiding on-site self-directed field observations.'}</p>
+            </div>
 
-          <div class="pillar-card">
-            <div class="pillar-icon-box" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">📊</div>
-            <h3>${isId ? 'Big Data Riset Pariwisata' : 'Big Data & Semantic Mining'}</h3>
-            <p>${isId ? 'Sintesis tematik kualitatif dari ulasan lapangan untuk riset kebijakan pariwisata berkelanjutan nasional.' : 'Automated thematic keyword mining from student feedback for policy research.'}</p>
+            <div class="pillar-card">
+              <div class="pillar-icon-box" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">📝</div>
+              <h3>${isId ? 'Jurnal Riset & Rubrik Dosen' : 'Rubric Evaluation Journal'}</h3>
+              <p>${isId ? 'Pengumpulan tugas refleksi lapangan terstruktur dengan penilaian rubrik objektif oleh dosen pembimbing.' : 'Structured field journal reflections graded against standardized pedagogical rubrics.'}</p>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-icon-box" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">📊</div>
+              <h3>${isId ? 'Big Data Riset Pariwisata' : 'Big Data & Semantic Mining'}</h3>
+              <p>${isId ? 'Sintesis tematik kualitatif dari ulasan lapangan untuk riset kebijakan pariwisata berkelanjutan nasional.' : 'Automated thematic keyword mining from student feedback for policy research.'}</p>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- 6. Interactive Role Selection -->
-      <section class="landing-section" id="role-selection" style="background: #f1f5f9; max-width: 100%; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+      <section class="landing-section-wrapper roles-section-wrap" id="role-selection">
         <div class="roles-wrapper">
           <div class="landing-section-header">
             <span class="landing-section-pill" style="background: #e0f2fe; color: #0369a1;">👥 ${isId ? 'Akses Pengguna' : 'User Access'}</span>
@@ -570,36 +576,38 @@ function renderWelcomeScreen(container) {
       </section>
 
       <!-- 7. Indonesian Tourism Polytechnics Campuses -->
-      <section class="landing-section" id="campuses-selection">
-        <div class="landing-section-header">
-          <span class="landing-section-pill" style="background: #ecfdf5; color: #047857;">🏛️ ${isId ? 'Ekosistem Poltekpar' : 'Polytechnics Network'}</span>
-          <h2>${t('choose_poly')}</h2>
-          <p>${isId 
-            ? 'Didukung oleh 6 Politeknik Pariwisata negeri di bawah naungan Kementerian Pariwisata dan Ekonomi Kreatif Republik Indonesia.' 
-            : 'Supported by 6 State Tourism Polytechnics under the Ministry of Tourism and Creative Economy of Indonesia.'}</p>
-        </div>
+      <section class="landing-section-wrapper campuses-section-wrap" id="campuses-selection">
+        <div class="landing-section">
+          <div class="landing-section-header">
+            <span class="landing-section-pill" style="background: #ecfdf5; color: #047857;">🏛️ ${isId ? 'Ekosistem Poltekpar' : 'Polytechnics Network'}</span>
+            <h2>${t('choose_poly')}</h2>
+            <p>${isId 
+              ? 'Didukung oleh 6 Politeknik Pariwisata negeri di bawah naungan Kementerian Pariwisata dan Ekonomi Kreatif Republik Indonesia.' 
+              : 'Supported by 6 State Tourism Polytechnics under the Ministry of Tourism and Creative Economy of Indonesia.'}</p>
+          </div>
 
-        <div class="poly-selection-grid">
-          ${Object.keys(POLYTECHNICS).map(key => {
-            const poly = POLYTECHNICS[key];
-            const isBali = key === 'bali';
-            return `
-              <div class="poly-badge-card ${state.activePoly === key ? 'active-border' : ''}" data-poly="${key}">
-                ${isBali ? `<span class="poly-special-pill">🌟 ${t('featured_campus')}</span>` : ''}
-                <div class="poly-badge-logo">${poly.logo}</div>
-                <div class="poly-badge-info">
-                  <h4>${poly.name}</h4>
-                  <p>${poly.destinations.length} ${t('destinations')} • ${poly.resources.length} Handouts</p>
+          <div class="poly-selection-grid">
+            ${Object.keys(POLYTECHNICS).map(key => {
+              const poly = POLYTECHNICS[key];
+              const isBali = key === 'bali';
+              return `
+                <div class="poly-badge-card ${state.activePoly === key ? 'active-border' : ''}" data-poly="${key}">
+                  ${isBali ? `<span class="poly-special-pill">🌟 ${t('featured_campus')}</span>` : ''}
+                  <div class="poly-badge-logo">${poly.logo}</div>
+                  <div class="poly-badge-info">
+                    <h4>${poly.name}</h4>
+                    <p>${poly.destinations.length} ${t('destinations')} • ${poly.resources.length} Handouts</p>
+                  </div>
                 </div>
-              </div>
-            `;
-          }).join('')}
+              `;
+            }).join('')}
+          </div>
         </div>
       </section>
 
       <!-- 8. Integrated 3-Phase Methodology -->
-      <section class="landing-section" id="methodology-section" style="background: #fafaf9; max-width: 100%; border-top: 1px solid #e7e5e4;">
-        <div style="max-width: 1200px; margin: 0 auto;">
+      <section class="landing-section-wrapper methodology-section-wrap" id="methodology-section">
+        <div class="landing-section">
           <div class="landing-section-header">
             <span class="landing-section-pill" style="background: #fef3c7; color: #b45309;">⚙️ ${isId ? 'Alur Studi Terpadu' : 'Study Workflow'}</span>
             <h2>${t('method_title')}</h2>
@@ -632,54 +640,56 @@ function renderWelcomeScreen(container) {
       </section>
 
       <!-- 9. NEW: Authentic Testimonials & Academic Community Voice -->
-      <section class="landing-section" id="testimonials-section">
-        <div class="landing-section-header">
-          <span class="landing-section-pill" style="background: #fce7f3; color: #be185d;">💬 ${isId ? 'Suara Akademisi & Praktisi' : 'Community Voices'}</span>
-          <h2>${isId ? 'Apa Kata Mahasiswa & Dosen Pariwisata' : 'What Students & Lecturers Say'}</h2>
-          <p>${isId 
-            ? 'Pengalaman nyata civitas akademika dalam memanfaatkan platform edutourism hybrid di destinasi wisata Indonesia.' 
-            : 'Real perspectives from academic researchers leveraging hybrid edutourism across Indonesian destinations.'}</p>
-        </div>
-
-        <div class="testimonials-grid">
-          <div class="testimonial-card">
-            <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-            <p class="testimonial-text">"${isId 
-              ? 'Mempelajari sistem irigasi Subak Jatiluwih secara hybrid dengan peta rute real-time dan panorama 360° membuat survei lapangan 3x lebih efisien!' 
-              : 'Studying the Jatiluwih Subak irrigation system in hybrid mode with live routing and 360° views made our field survey 3x more efficient!'}"</p>
-            <div class="testimonial-author">
-              <div class="author-avatar" style="background: #f97316;">KL</div>
-              <div>
-                <h4>Kadek Ayu Lestari</h4>
-                <p>${isId ? 'Mahasiswi Manajemen Kepariwisataan • Poltekpar Bali' : 'Tourism Management Student • Poltekpar Bali'}</p>
-              </div>
-            </div>
+      <section class="landing-section-wrapper testimonials-section-wrap" id="testimonials-section">
+        <div class="landing-section">
+          <div class="landing-section-header">
+            <span class="landing-section-pill" style="background: #fce7f3; color: #be185d;">💬 ${isId ? 'Suara Akademisi & Praktisi' : 'Community Voices'}</span>
+            <h2>${isId ? 'Apa Kata Mahasiswa & Dosen Pariwisata' : 'What Students & Lecturers Say'}</h2>
+            <p>${isId 
+              ? 'Pengalaman nyata civitas akademika dalam memanfaatkan platform edutourism hybrid di destinasi wisata Indonesia.' 
+              : 'Real perspectives from academic researchers leveraging hybrid edutourism across Indonesian destinations.'}</p>
           </div>
 
-          <div class="testimonial-card">
-            <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-            <p class="testimonial-text">"${isId 
-              ? 'Sangat praktis untuk mengevaluasi laporan jurnal observasi mahasiswa secara terstruktur dengan rubrik terstandar yang langsung terhubung ke database cloud.' 
-              : 'Remarkably efficient for grading student field observation journals against structured rubrics synced directly with cloud storage.'}"</p>
-            <div class="testimonial-author">
-              <div class="author-avatar" style="background: #0284c7;">DW</div>
-              <div>
-                <h4>Dr. I Made Wardana, M.Par</h4>
-                <p>${isId ? 'Dosen Senior Perencanaan Pariwisata' : 'Senior Lecturer in Tourism Planning'}</p>
+          <div class="testimonials-grid">
+            <div class="testimonial-card">
+              <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"${isId 
+                ? 'Mempelajari sistem irigasi Subak Jatiluwih secara hybrid dengan peta rute real-time dan panorama 360° membuat survei lapangan 3x lebih efisien!' 
+                : 'Studying the Jatiluwih Subak irrigation system in hybrid mode with live routing and 360° views made our field survey 3x more efficient!'}"</p>
+              <div class="testimonial-author">
+                <div class="author-avatar" style="background: #f97316;">KL</div>
+                <div>
+                  <h4>Kadek Ayu Lestari</h4>
+                  <p>${isId ? 'Mahasiswi Manajemen Kepariwisataan • Poltekpar Bali' : 'Tourism Management Student • Poltekpar Bali'}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="testimonial-card">
-            <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-            <p class="testimonial-text">"${isId 
-              ? 'Fitur rute jalan dengan kalkulasi macet realistis sangat membantu kami mengatur jadwal bus pariwisata mahasiswa tanpa khawatir terjebak antrean jalan.' 
-              : 'The realistic road routing with traffic modeling helped us optimize student coach schedules without unexpected delays.'}"</p>
-            <div class="testimonial-author">
-              <div class="author-avatar" style="background: #10b981;">SN</div>
-              <div>
-                <h4>Siti Nurhaliza, S.Tr.Par</h4>
-                <p>${isId ? 'Koordinator Ekspedisi Lapangan & Ekowisata' : 'Field Expedition & Ecotourism Coordinator'}</p>
+            <div class="testimonial-card">
+              <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"${isId 
+                ? 'Sangat praktis untuk mengevaluasi laporan jurnal observasi mahasiswa secara terstruktur dengan rubrik terstandar yang langsung terhubung ke database cloud.' 
+                : 'Remarkably efficient for grading student field observation journals against structured rubrics synced directly with cloud storage.'}"</p>
+              <div class="testimonial-author">
+                <div class="author-avatar" style="background: #0284c7;">DW</div>
+                <div>
+                  <h4>Dr. I Made Wardana, M.Par</h4>
+                  <p>${isId ? 'Dosen Senior Perencanaan Pariwisata' : 'Senior Lecturer in Tourism Planning'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="testimonial-card">
+              <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+              <p class="testimonial-text">"${isId 
+                ? 'Fitur rute jalan dengan kalkulasi macet realistis sangat membantu kami mengatur jadwal bus pariwisata mahasiswa tanpa khawatir terjebak antrean jalan.' 
+                : 'The realistic road routing with traffic modeling helped us optimize student coach schedules without unexpected delays.'}"</p>
+              <div class="testimonial-author">
+                <div class="author-avatar" style="background: #10b981;">SN</div>
+                <div>
+                  <h4>Siti Nurhaliza, S.Tr.Par</h4>
+                  <p>${isId ? 'Koordinator Ekspedisi Lapangan & Ekowisata' : 'Field Expedition & Ecotourism Coordinator'}</p>
+                </div>
               </div>
             </div>
           </div>
