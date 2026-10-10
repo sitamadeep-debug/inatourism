@@ -13,6 +13,11 @@ const state = {
   selectedDestId: null, // set dynamically based on active poly
   activeDestTab: 'info', // 'info' | 'activity' | 'comments'
   pathMode: true, // draw route lines
+  transportMode: localStorage.getItem('edutour_transport_mode') || 'driving', // 'driving' | 'transit' | 'motorcycle' | 'walking'
+  trafficLayer: localStorage.getItem('edutour_traffic_layer') !== 'false', // boolean: show traffic conditions & live traffic tiles
+  isSimulating: false,
+  simIndex: 0,
+  simTimer: null,
   audioPlaying: false,
   audioProgress: 0,
   audioInterval: null,
@@ -48,6 +53,8 @@ function saveState() {
   localStorage.setItem('edutour_poly', state.activePoly);
   localStorage.setItem('edutour_view', state.activeView);
   localStorage.setItem('edutour_lang', state.lang);
+  localStorage.setItem('edutour_transport_mode', state.transportMode);
+  localStorage.setItem('edutour_traffic_layer', state.trafficLayer);
   localStorage.setItem('edutour_comments', JSON.stringify(state.comments));
   localStorage.setItem('edutour_checklists', JSON.stringify(state.checklists));
   localStorage.setItem('edutour_tasks', JSON.stringify(state.tasks));
@@ -977,12 +984,23 @@ function renderClassroom(container) {
 // -------------------------------------------------------------
 // VIEW 3: VIRTUAL TOUR & MAP EXPLORER (With Google Maps Layer)
 // -------------------------------------------------------------
+// -------------------------------------------------------------
+// VIEW 3: VIRTUAL TOUR & MAP EXPLORER (With Google Maps Layer)
+// -------------------------------------------------------------
 let mapInstance = null;
+let routeLayers = [];
+let incidentMarkers = [];
+let transitMarkers = [];
+let simVehicleMarker = null;
+let simInterval = null;
+let googleTrafficTile = null;
+let googleStreetsTile = null;
 
 function renderExplorer(container) {
   const poly = POLYTECHNICS[state.activePoly];
   const activeDest = poly.destinations.find(d => d.id === state.selectedDestId) || poly.destinations[0];
   state.selectedDestId = activeDest.id;
+  const isId = state.lang === 'id';
 
   container.innerHTML = `
     <div class="map-explorer-layout">
@@ -990,16 +1008,16 @@ function renderExplorer(container) {
         <div class="sidebar-search">
           <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; display:flex; justify-content:space-between; align-items:center;">
             <span>📍 ${t('destinations')}</span>
-            <button class="role-btn" id="toggle-path-btn" style="font-size:0.7rem; padding: 0.2rem 0.5rem; background:${state.pathMode ? 'var(--poly-secondary)' : '#cbd5e1'}; color:${state.pathMode ? '#000' : '#475569'}">
+            <button class="role-btn" id="toggle-path-btn" style="font-size:0.7rem; padding: 0.2rem 0.6rem; background:${state.pathMode ? 'var(--poly-secondary)' : '#cbd5e1'}; color:${state.pathMode ? '#000' : '#475569'}; font-weight:700;">
               ${t('route')}: ${state.pathMode ? 'ON' : 'OFF'}
             </button>
           </h3>
-          <p style="font-size:0.75rem; color:var(--text-muted);">${state.lang === 'en' ? 'Explore route destinations in sequencing.' : 'Jelajahi destinasi rute secara berurutan.'}</p>
+          <p style="font-size:0.75rem; color:var(--text-muted);">${isId ? 'Pilih destinasi untuk melihat panduan rute jalan & navigasi.' : 'Select destination to view road route & navigation guide.'}</p>
         </div>
         <div class="destinations-scroll" id="explorer-dest-list">
           ${poly.destinations.map((d, index) => `
             <div class="dest-card-small ${d.id === state.selectedDestId ? 'active' : ''}" data-id="${d.id}">
-              <span class="tour-path-badge">${state.lang === 'en' ? 'Route Step' : 'Langkah Rute'} ${index + 1}</span>
+              <span class="tour-path-badge">${isId ? 'Langkah Rute' : 'Route Step'} ${index + 1}</span>
               <h4 style="font-weight:700; color:var(--poly-primary); margin-top: 0.8rem;">${d.name}</h4>
               <p>${getLocalized(d.description)}</p>
             </div>
@@ -1007,8 +1025,59 @@ function renderExplorer(container) {
         </div>
       </div>
 
-      <div class="map-center-panel">
+      <div class="map-center-panel" style="position:relative;">
         <div id="map-canvas" class="map-container"></div>
+
+        <!-- 1. Google Maps Navigation HUD Card -->
+        <div class="gmap-nav-panel" id="gmap-nav-panel">
+          <div class="gmap-nav-header">
+            <div class="gmap-transport-tabs">
+              <button class="gmap-tab-btn ${state.transportMode === 'driving' ? 'active' : ''}" data-mode="driving" title="${isId ? 'Mobil & Minibus Wisata' : 'Car / Driving'}">
+                <span class="tab-icon">🚗</span>
+                <span class="tab-title">${isId ? 'Mobil' : 'Drive'}</span>
+              </button>
+              <button class="gmap-tab-btn ${state.transportMode === 'transit' ? 'active' : ''}" data-mode="transit" title="${isId ? 'Kereta Api & Angkutan Massal' : 'Train & Transit'}">
+                <span class="tab-icon">🚆</span>
+                <span class="tab-title">${isId ? 'Kereta/Bus' : 'Transit'}</span>
+              </button>
+              <button class="gmap-tab-btn ${state.transportMode === 'motorcycle' ? 'active' : ''}" data-mode="motorcycle" title="${isId ? 'Sepeda Motor (Shortcut)' : 'Motorbike'}">
+                <span class="tab-icon">🛵</span>
+                <span class="tab-title">${isId ? 'Motor' : 'Moto'}</span>
+              </button>
+              <button class="gmap-tab-btn ${state.transportMode === 'walking' ? 'active' : ''}" data-mode="walking" title="${isId ? 'Jalan Kaki / Eco-Trail' : 'Walking'}">
+                <span class="tab-icon">🚶</span>
+                <span class="tab-title">${isId ? 'Jalan' : 'Walk'}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="gmap-nav-body" id="gmap-nav-body">
+            <!-- Dynamic routing summary content rendered by updateGMapNavCard -->
+          </div>
+        </div>
+
+        <!-- 2. Google Maps Navigation Turn-by-Turn Simulation HUD -->
+        <div class="gmap-sim-hud" id="gmap-sim-hud" style="display: none;">
+          <div class="gmap-sim-arrow" id="sim-hud-icon">⬆️</div>
+          <div class="gmap-sim-info">
+            <h4 id="sim-hud-street">${isId ? 'Menyusuri Jalan Raya' : 'Navigating Highway'}</h4>
+            <p id="sim-hud-stats">${isId ? 'Kecepatan: 50 km/jam • Arus Lancar' : 'Speed: 50 km/h • Smooth Traffic'}</p>
+          </div>
+          <button class="gmap-sim-close-btn" id="sim-hud-stop">⏹️ ${isId ? 'Selesai' : 'Stop'}</button>
+        </div>
+
+        <!-- 3. Traffic Conditions Legend -->
+        <div class="gmap-traffic-legend" id="gmap-traffic-legend">
+          <span>🚦 ${isId ? 'Lalu Lintas' : 'Traffic'}:</span>
+          <div class="legend-bar-container">
+            <span class="legend-bar-seg green" title="${isId ? 'Lancar (>40 km/jam)' : 'Fast (>40 km/h)'}"></span>
+            <span class="legend-bar-seg yellow" title="${isId ? 'Sedang (20-40 km/jam)' : 'Moderate (20-40 km/h)'}"></span>
+            <span class="legend-bar-seg red" title="${isId ? 'Macet (<20 km/jam)' : 'Heavy (<20 km/h)'}"></span>
+          </div>
+          <span style="font-size:0.68rem; color:#64748b;" id="legend-status-text">${isId ? 'Lancar / Macet' : 'Traffic Live'}</span>
+        </div>
+
+        <!-- 4. Coordinates Tooltip Overlay -->
         <div class="map-controls-overlay">
           <span>🎯 Coordinates: </span>
           <span style="font-family:monospace; color:var(--poly-primary);" id="overlay-coords">
@@ -1023,6 +1092,7 @@ function renderExplorer(container) {
     </div>
   `;
 
+  // Attach Destination Cards Click
   document.getElementById('explorer-dest-list').querySelectorAll('[data-id]').forEach(card => {
     card.addEventListener('click', () => {
       state.selectedDestId = card.dataset.id;
@@ -1045,17 +1115,130 @@ function renderExplorer(container) {
     });
   });
 
+  // Attach Path Toggle Button
   document.getElementById('toggle-path-btn').addEventListener('click', () => {
     state.pathMode = !state.pathMode;
     saveState();
-    renderExplorer(container);
+    renderRealRoadNavigation();
+    updateGMapNavCard();
+    const btn = document.getElementById('toggle-path-btn');
+    if (btn) {
+      btn.style.background = state.pathMode ? 'var(--poly-secondary)' : '#cbd5e1';
+      btn.style.color = state.pathMode ? '#000' : '#475569';
+      btn.textContent = `${t('route')}: ${state.pathMode ? 'ON' : 'OFF'}`;
+    }
   });
 
+  // Attach Transport Mode Tabs
+  document.querySelectorAll('.gmap-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.gmap-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.transportMode = btn.dataset.mode;
+      saveState();
+      updateGMapNavCard();
+      renderRealRoadNavigation();
+    });
+  });
+
+  // Attach Stop Simulation Button
+  const stopSimBtn = document.getElementById('sim-hud-stop');
+  if (stopSimBtn) {
+    stopSimBtn.addEventListener('click', () => {
+      stopRoadNavigationSimulation();
+    });
+  }
+
+  // Initial Content Population
+  updateGMapNavCard();
   renderExplorerDetails();
 
   setTimeout(() => {
     initLeafletMap();
   }, 100);
+}
+
+function updateGMapNavCard() {
+  const container = document.getElementById('gmap-nav-body');
+  if (!container) return;
+
+  const isId = state.lang === 'id';
+  const network = window.ROUTING_NETWORK && (window.ROUTING_NETWORK[state.activePoly] || window.ROUTING_NETWORK.bali);
+  const modeData = network && network.modes && network.modes[state.transportMode] ? network.modes[state.transportMode] : {
+    name: { en: "Driving", id: "Mobil" },
+    icon: "🚗",
+    totalTime: "1 jam 45 mnt",
+    totalDistance: "58 km",
+    trafficDelay: "+15 mnt",
+    statusText: { en: "Normal city traffic.", id: "Lalu lintas perkotaan ramai lancar." },
+    fuelCost: "Rp 60.000",
+    roadType: { en: "Main Highways", id: "Jalan Utama" }
+  };
+
+  const isHeavy = modeData.trafficDelay && modeData.trafficDelay.includes('+') && !modeData.trafficDelay.includes('+8');
+  const alertClass = state.transportMode === 'transit' ? 'transit' : (isHeavy ? '' : 'green');
+
+  container.innerHTML = `
+    <div class="gmap-route-headline">
+      <span class="gmap-eta-time ${isHeavy ? 'heavy' : ''}">${modeData.totalTime}</span>
+      <span class="gmap-distance-badge">${modeData.totalDistance}</span>
+    </div>
+
+    <div class="gmap-route-via">
+      <span>${modeData.icon}</span>
+      <span>${getLocalized(modeData.roadType)}</span>
+    </div>
+
+    <div class="gmap-traffic-alert-box ${alertClass}">
+      <strong>${state.transportMode === 'transit' ? 'ℹ️ Transport Notice:' : (state.trafficLayer ? '🚦 Traffic Status:' : '🛣️ Route Mode:')}</strong>
+      <span>${getLocalized(modeData.statusText)}</span>
+    </div>
+
+    <div style="font-size:0.75rem; color:#64748b; margin-bottom:0.75rem; display:flex; justify-content:space-between;">
+      <span>${isId ? 'Biaya Estimasi' : 'Estimated Cost'}: <strong>${modeData.fuelCost}</strong></span>
+      <span>${isId ? 'Keterlambatan' : 'Delay'}: <strong style="color:${isHeavy ? '#dc2626' : '#15803d'}">${modeData.trafficDelay}</strong></span>
+    </div>
+
+    <div class="gmap-actions-row">
+      <button class="gmap-btn-start" id="gmap-start-sim-btn">
+        <span>▶️</span> ${isId ? 'Mulai Navigasi' : 'Start Navigation'}
+      </button>
+
+      <button class="gmap-btn-traffic-toggle ${state.trafficLayer ? 'active' : ''}" id="gmap-toggle-traffic-btn" title="${isId ? 'Nyalakan/Matikan Kondisi Macet' : 'Toggle Live Traffic'}">
+        <span>🚦</span> ${state.trafficLayer ? (isId ? 'Macet: ON' : 'Traffic: ON') : (isId ? 'Macet: OFF' : 'Traffic: OFF')}
+      </button>
+    </div>
+  `;
+
+  // Attach start navigation button
+  const startBtn = document.getElementById('gmap-start-sim-btn');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      startRoadNavigationSimulation();
+    });
+  }
+
+  // Attach traffic toggle button
+  const trafficBtn = document.getElementById('gmap-toggle-traffic-btn');
+  if (trafficBtn) {
+    trafficBtn.addEventListener('click', () => {
+      state.trafficLayer = !state.trafficLayer;
+      saveState();
+      updateGMapNavCard();
+      renderRealRoadNavigation();
+
+      // Switch Google Maps base tile layer if live traffic active
+      if (mapInstance && googleTrafficTile && googleStreetsTile) {
+        if (state.trafficLayer) {
+          mapInstance.removeLayer(googleStreetsTile);
+          googleTrafficTile.addTo(mapInstance);
+        } else {
+          mapInstance.removeLayer(googleTrafficTile);
+          googleStreetsTile.addTo(mapInstance);
+        }
+      }
+    });
+  }
 }
 
 function initLeafletMap() {
@@ -1070,44 +1253,65 @@ function initLeafletMap() {
     return;
   }
 
-  // Initialize Map
-  mapInstance = L.map('map-canvas').setView(activeDest.coords, 13);
+  // If map instance already exists, remove it cleanly before re-initializing
+  if (mapInstance) {
+    try {
+      mapInstance.remove();
+    } catch(e) {
+      console.warn("Map remove notice:", e);
+    }
+    mapInstance = null;
+  }
+
+  // Initialize Leaflet Map
+  mapInstance = L.map('map-canvas').setView(activeDest.coords, 11);
 
   // --- GOOGLE MAPS TILE LAYERS (High Quality, Clean, No Watermarks) ---
-  const googleStreets = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+  googleStreetsTile = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
     maxZoom: 20,
-    attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+    attribution: '&copy; Google Maps'
+  });
+
+  googleTrafficTile = L.tileLayer('https://mt1.google.com/vt/lyrs=m,traffic&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    attribution: '&copy; Google Maps Live Traffic'
   });
 
   const googleSatellite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
     maxZoom: 20,
-    attribution: '&copy; <a href="https://www.google.com/maps">Google Maps Satellite</a>'
+    attribution: '&copy; Google Maps Satellite'
   });
 
   const openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    attribution: '&copy; OpenStreetMap'
   });
 
-  // Default to Google Maps Roadmap
-  googleStreets.addTo(mapInstance);
+  // Add initial base tile: Google Traffic if active, otherwise Google Streets
+  if (state.trafficLayer) {
+    googleTrafficTile.addTo(mapInstance);
+  } else {
+    googleStreetsTile.addTo(mapInstance);
+  }
 
   // Layer control switcher widget
   const baseMaps = {
-    "🗺️ Google Maps": googleStreets,
+    "🚦 Google Maps (Live Traffic)": googleTrafficTile,
+    "🗺️ Google Maps (Standar)": googleStreetsTile,
     "🛰️ Google Satellite": googleSatellite,
     "🌐 OpenStreetMap": openStreetMap
   };
   L.control.layers(baseMaps, null, { position: 'topright' }).addTo(mapInstance);
 
+  // Add destination numbered markers
   const markers = [];
   poly.destinations.forEach((d, idx) => {
     const customIcon = L.divIcon({
       className: 'custom-map-marker',
       html: `
         <div style="
-          width: 34px; 
-          height: 34px; 
+          width: 36px; 
+          height: 36px; 
           background: var(--poly-bg-gradient); 
           border: 3px solid white; 
           border-radius: 50%; 
@@ -1116,21 +1320,28 @@ function initLeafletMap() {
           justify-content: center; 
           color: white; 
           font-weight: 800; 
-          font-size: 0.85rem;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+          font-size: 0.9rem;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+          cursor: pointer;
         ">
           ${idx + 1}
         </div>
       `,
-      iconSize: [34, 34],
-      iconAnchor: [17, 17]
+      iconSize: [36, 36],
+      iconAnchor: [18, 18]
     });
 
     const marker = L.marker(d.coords, { icon: customIcon, title: d.name })
       .bindPopup(`
-        <div style="font-family:'Inter', sans-serif;">
-          <h4 style="margin:0; font-size:0.95rem; color:var(--poly-primary); font-weight:700;">${d.name}</h4>
-          <p style="margin:0.25rem 0 0; font-size:0.75rem; color:#64748b;">${state.lang === 'en' ? 'Route Step' : 'Langkah Rute'} ${idx + 1}</p>
+        <div style="font-family:'Inter', sans-serif; min-width: 170px;">
+          <span style="background:var(--poly-secondary); color:#000; font-size:0.68rem; font-weight:800; padding:2px 6px; border-radius:4px; text-transform:uppercase;">
+            ${state.lang === 'en' ? 'Stop' : 'Titik'} ${idx + 1}
+          </span>
+          <h4 style="margin:0.4rem 0 0.2rem; font-size:0.95rem; color:var(--poly-primary); font-weight:800;">${d.name}</h4>
+          <p style="margin:0; font-size:0.75rem; color:#64748b; line-height:1.4;">${getLocalized(d.description)}</p>
+          <div style="margin-top:0.5rem; font-size:0.75rem; color:#0f172a; font-weight:700;">
+            📍 ${d.coords[0].toFixed(4)}, ${d.coords[1].toFixed(4)}
+          </div>
         </div>
       `)
       .addTo(mapInstance);
@@ -1157,18 +1368,356 @@ function initLeafletMap() {
     mapInstance.fitBounds(group.getBounds().pad(0.2));
   }
 
-  if (state.pathMode && poly.destinations.length > 1) {
-    const pathCoords = poly.destinations.map(d => d.coords);
-    L.polyline(pathCoords, {
-      color: 'var(--poly-primary)',
-      weight: 4,
-      opacity: 0.8,
-      dashArray: '8, 8',
-      lineJoin: 'round'
-    }).addTo(mapInstance);
-  }
+  // Render Real Road Route Geometry, Traffic Colors & Incidents
+  renderRealRoadNavigation();
 
   markers.find(m => m.options.title === activeDest.name)?.openPopup();
+}
+
+function renderRealRoadNavigation() {
+  if (!mapInstance) return;
+
+  // 1. Clean up existing routing elements
+  routeLayers.forEach(l => {
+    try { mapInstance.removeLayer(l); } catch(e) {}
+  });
+  routeLayers = [];
+
+  incidentMarkers.forEach(m => {
+    try { mapInstance.removeLayer(m); } catch(e) {}
+  });
+  incidentMarkers = [];
+
+  transitMarkers.forEach(m => {
+    try { mapInstance.removeLayer(m); } catch(e) {}
+  });
+  transitMarkers = [];
+
+  if (!state.pathMode) return;
+
+  const poly = POLYTECHNICS[state.activePoly];
+  const network = window.ROUTING_NETWORK && (window.ROUTING_NETWORK[state.activePoly] || window.ROUTING_NETWORK.bali);
+  const isId = state.lang === 'id';
+
+  // 2. Bali Real Road Routing Network
+  if (state.activePoly === 'bali' && network && network.segments) {
+    
+    // A. Driving / Motorcycle / Transit Road Drawing
+    if (state.transportMode === 'driving' || state.transportMode === 'motorcycle' || state.transportMode === 'transit') {
+      network.segments.forEach(segment => {
+        segment.subSegments.forEach(sub => {
+          // Underlayer dark road casing for Google Maps contrast
+          const casing = L.polyline(sub.coords, {
+            color: '#0f172a',
+            weight: 8,
+            opacity: 0.35,
+            lineCap: 'round',
+            lineJoin: 'round'
+          }).addTo(mapInstance);
+          routeLayers.push(casing);
+
+          // Top colored line
+          let lineColor = sub.color;
+          let dashArray = null;
+
+          if (state.transportMode === 'transit') {
+            lineColor = '#10b981';
+            dashArray = '7, 7';
+          } else if (!state.trafficLayer) {
+            lineColor = state.transportMode === 'driving' ? '#1a73e8' : '#f59e0b';
+          }
+
+          const line = L.polyline(sub.coords, {
+            color: lineColor,
+            weight: 5.5,
+            opacity: 0.95,
+            dashArray: dashArray,
+            lineCap: 'round',
+            lineJoin: 'round'
+          }).addTo(mapInstance);
+
+          const statusBadge = sub.status === 'heavy' ? '🔴 Macet Padat (+15m)' : (sub.status === 'moderate' ? '🟡 Ramai Lancar' : '🟢 Bebas Hambatan');
+          line.bindTooltip(`
+            <div style="font-family:'Inter', sans-serif; font-size:0.78rem;">
+              <strong>${segment.fromName} ➔ ${segment.toName}</strong><br>
+              ${isId ? 'Jarak' : 'Distance'}: ${segment.distanceKm} km • ${isId ? 'Waktu' : 'Duration'}: ${segment.durationDriving}<br>
+              ${isId ? 'Via' : 'Route'}: ${segment.via}<br>
+              ${isId ? 'Kondisi' : 'Traffic'}: <strong>${statusBadge}</strong>
+            </div>
+          `, { sticky: true });
+
+          routeLayers.push(line);
+        });
+      });
+    }
+
+    // B. Walking Mode: Scenic Eco Trails
+    if (state.transportMode === 'walking') {
+      network.segments.forEach(segment => {
+        const line = L.polyline(segment.subSegments.flatMap(s => s.coords), {
+          color: '#8b5cf6',
+          weight: 4,
+          opacity: 0.9,
+          dashArray: '4, 8',
+          lineCap: 'round'
+        }).addTo(mapInstance);
+
+        line.bindTooltip(`
+          <div style="font-family:'Inter', sans-serif; font-size:0.78rem;">
+            🚶 <strong>${isId ? 'Jalur Pejalan Kaki & Eco-Trail' : 'Pedestrian & Eco-Trail'}</strong><br>
+            ${segment.fromName} ➔ ${segment.toName}
+          </div>
+        `, { sticky: true });
+
+        routeLayers.push(line);
+      });
+    }
+
+    // C. Traffic Incidents: Pulsing Red Markers
+    if (state.trafficLayer && (state.transportMode === 'driving' || state.transportMode === 'motorcycle') && network.incidents) {
+      network.incidents.forEach(inc => {
+        const incIcon = L.divIcon({
+          className: 'custom-traffic-incident',
+          html: `<div class="traffic-incident-pulse" title="${inc.title[state.lang]}">⚠️</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+
+        const m = L.marker(inc.coords, { icon: incIcon })
+          .bindPopup(`
+            <div style="font-family:'Inter', sans-serif; min-width: 210px;">
+              <span style="background:#fee2e2; color:#b91c1c; font-size:0.68rem; font-weight:800; padding:2px 6px; border-radius:4px; text-transform:uppercase;">
+                ⚠️ ${isId ? 'Peringatan Macet' : 'Traffic Delay'}
+              </span>
+              <h4 style="margin:0.35rem 0 0.2rem; font-size:0.88rem; color:#dc2626; font-weight:800;">
+                ${inc.title[state.lang]}
+              </h4>
+              <p style="margin:0; font-size:0.75rem; color:#475569; line-height:1.4;">
+                ${inc.desc[state.lang]}
+              </p>
+              <div style="margin-top:0.4rem; font-size:0.75rem; font-weight:800; color:#b91c1c;">
+                ⏱️ ${isId ? 'Perkiraan Keterlambatan' : 'Delay'}: ${inc.delay}
+              </div>
+            </div>
+          `)
+          .addTo(mapInstance);
+
+        incidentMarkers.push(m);
+      });
+    }
+
+    // D. Transit Hub Markers (Bus Terminals, LRT Stations)
+    if (state.transportMode === 'transit' && network.transitHubs) {
+      network.transitHubs.forEach(hub => {
+        const hubIcon = L.divIcon({
+          className: 'custom-transit-hub',
+          html: `
+            <div style="
+              background: #10b981; 
+              color: white; 
+              width: 30px; 
+              height: 30px; 
+              border-radius: 8px; 
+              display:flex; 
+              align-items:center; 
+              justify-content:center; 
+              font-size: 1rem; 
+              border: 2px solid white; 
+              box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            ">
+              ${hub.type.includes('Rail') ? '🚆' : '🚌'}
+            </div>
+          `,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+
+        const m = L.marker(hub.coords, { icon: hubIcon })
+          .bindPopup(`
+            <div style="font-family:'Inter', sans-serif; min-width: 190px;">
+              <span style="background:#d1fae5; color:#065f46; font-size:0.68rem; font-weight:800; padding:2px 6px; border-radius:4px; text-transform:uppercase;">
+                ${hub.type}
+              </span>
+              <h4 style="margin:0.35rem 0 0.2rem; font-size:0.88rem; color:#065f46; font-weight:800;">
+                ${hub.name}
+              </h4>
+              <p style="margin:0; font-size:0.75rem; color:#475569; line-height:1.4;">
+                ${hub.info}
+              </p>
+            </div>
+          `)
+          .addTo(mapInstance);
+
+        transitMarkers.push(m);
+      });
+    }
+
+  } else {
+    // 3. Fallback for other polytechnics (Generates smooth curved realistic road polylines)
+    if (poly.destinations.length > 1) {
+      const coords = poly.destinations.map(d => d.coords);
+      
+      // Interpolate curved highway road nodes
+      const smoothRoad = [];
+      for (let i = 0; i < coords.length - 1; i++) {
+        const p1 = coords[i];
+        const p2 = coords[i + 1];
+        smoothRoad.push(p1);
+        
+        // Midpoint curve offset
+        const midLat = (p1[0] + p2[0]) / 2 + (i % 2 === 0 ? 0.015 : -0.015);
+        const midLng = (p1[1] + p2[1]) / 2 + (i % 2 === 0 ? -0.018 : 0.018);
+        smoothRoad.push([midLat, midLng]);
+      }
+      smoothRoad.push(coords[coords.length - 1]);
+
+      // Casing
+      const casing = L.polyline(smoothRoad, {
+        color: '#0f172a',
+        weight: 8,
+        opacity: 0.35,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(mapInstance);
+      routeLayers.push(casing);
+
+      // Highway Traffic line
+      const routeLine = L.polyline(smoothRoad, {
+        color: state.trafficLayer ? '#22c55e' : (state.transportMode === 'transit' ? '#10b981' : '#1a73e8'),
+        weight: 5.5,
+        opacity: 0.95,
+        dashArray: state.transportMode === 'transit' ? '7, 7' : null,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(mapInstance);
+
+      routeLine.bindTooltip(`
+        <div style="font-family:'Inter', sans-serif; font-size:0.78rem;">
+          <strong>${poly.name} Tour Highway</strong><br>
+          ${isId ? 'Moda' : 'Mode'}: ${state.transportMode.toUpperCase()} • ${state.trafficLayer ? '🟢 Lalu Lintas Lancar' : 'Jalur Terkoneksi'}
+        </div>
+      `);
+      routeLayers.push(routeLine);
+    }
+  }
+}
+
+// -------------------------------------------------------------
+// LIVE VEHICLE NAVIGATION SIMULATION (Google Maps Animated Navigation)
+// -------------------------------------------------------------
+function startRoadNavigationSimulation() {
+  if (!mapInstance) return;
+
+  const isId = state.lang === 'id';
+  const network = window.ROUTING_NETWORK && (window.ROUTING_NETWORK[state.activePoly] || window.ROUTING_NETWORK.bali);
+  
+  // Collect all coordinates along the highway
+  let allCoords = [];
+  let streetInstructions = [];
+
+  if (state.activePoly === 'bali' && network && network.segments) {
+    network.segments.forEach(segment => {
+      segment.subSegments.forEach(sub => {
+        allCoords.push(...sub.coords);
+      });
+      if (segment.steps) {
+        streetInstructions.push(...segment.steps);
+      }
+    });
+  } else {
+    const poly = POLYTECHNICS[state.activePoly];
+    allCoords = poly.destinations.map(d => d.coords);
+  }
+
+  if (allCoords.length < 2) return;
+
+  // Stop any active simulation
+  stopRoadNavigationSimulation();
+  state.isSimulating = true;
+  state.simIndex = 0;
+
+  // Show HUD
+  const hud = document.getElementById('gmap-sim-hud');
+  const hudIcon = document.getElementById('sim-hud-icon');
+  const hudStreet = document.getElementById('sim-hud-street');
+  const hudStats = document.getElementById('sim-hud-stats');
+  if (hud) hud.style.display = 'flex';
+
+  // Determine vehicle icon
+  let vIcon = '🚗';
+  if (state.transportMode === 'transit') vIcon = '🚌';
+  else if (state.transportMode === 'motorcycle') vIcon = '🛵';
+  else if (state.transportMode === 'walking') vIcon = '🚶';
+
+  if (hudIcon) hudIcon.textContent = vIcon;
+
+  // Create Vehicle Marker
+  const vehicleDivIcon = L.divIcon({
+    className: 'sim-vehicle-marker-container',
+    html: `<div class="vehicle-sim-marker">${vIcon}</div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18]
+  });
+
+  simVehicleMarker = L.marker(allCoords[0], { icon: vehicleDivIcon, zIndexOffset: 2000 }).addTo(mapInstance);
+  mapInstance.setView(allCoords[0], 14, { animate: true });
+
+  const totalSteps = allCoords.length;
+
+  simInterval = setInterval(() => {
+    state.simIndex++;
+
+    if (state.simIndex >= totalSteps) {
+      stopRoadNavigationSimulation();
+      alert(isId ? "🏁 Navigasi Tur Selesai! Anda telah mengunjungi seluruh rangkaian destinasi." : "🏁 Tour Navigation Complete! You have explored all destinations on this circuit.");
+      return;
+    }
+
+    const currentCoord = allCoords[state.simIndex];
+    simVehicleMarker.setLatLng(currentCoord);
+
+    // Update HUD text
+    const pct = Math.round((state.simIndex / totalSteps) * 100);
+    const speed = state.transportMode === 'walking' ? '5 km/jam' : (state.transportMode === 'motorcycle' ? '55 km/jam' : '45 km/jam');
+    
+    if (hudStreet) {
+      if (state.simIndex < 15) {
+        hudStreet.textContent = isId ? "Menyusuri Jl. Raya Uluwatu Pecatu" : "Along Jl. Raya Uluwatu Pecatu";
+      } else if (state.simIndex < 35) {
+        hudStreet.textContent = isId ? "Melewati Sunset Road Kuta" : "Crossing Sunset Road Kuta";
+      } else if (state.simIndex < 55) {
+        hudStreet.textContent = isId ? "Menuju Jl. Raya Kediri Tabanan" : "Approaching Jl. Raya Kediri Tabanan";
+      } else if (state.simIndex < 80) {
+        hudStreet.textContent = isId ? "Jalur Terasering Jatiluwih & Bedugul" : "Scenic Jatiluwih & Bedugul Pass";
+      } else if (state.simIndex < 105) {
+        hudStreet.textContent = isId ? "Melintasi Jembatan Tukad Bangkung Plaga" : "Crossing Tukad Bangkung Bridge";
+      } else {
+        hudStreet.textContent = isId ? "Menuju Tol Laut Bali Mandara" : "Approaching Bali Mandara Tollway";
+      }
+    }
+
+    if (hudStats) {
+      hudStats.textContent = `${isId ? 'Kecepatan' : 'Speed'}: ${speed} • ${pct}% ${isId ? 'rute selesai' : 'completed'}`;
+    }
+
+    // Auto pan smoothly
+    mapInstance.panTo(currentCoord, { animate: true, duration: 0.3 });
+
+  }, 320);
+}
+
+function stopRoadNavigationSimulation() {
+  state.isSimulating = false;
+  if (simInterval) {
+    clearInterval(simInterval);
+    simInterval = null;
+  }
+  if (simVehicleMarker && mapInstance) {
+    try { mapInstance.removeLayer(simVehicleMarker); } catch(e) {}
+    simVehicleMarker = null;
+  }
+  const hud = document.getElementById('gmap-sim-hud');
+  if (hud) hud.style.display = 'none';
 }
 
 function renderExplorerDetails() {

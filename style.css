@@ -2068,3 +2068,317 @@ button, input, select, textarea {
     font-size: 1.1rem;
   }
 }
+
+/* ============================================================= */
+/* GOOGLE MAPS STYLE NAVIGATION & TRAFFIC LAYER                  */
+/* ============================================================= */
+
+/* Floating Navigation HUD Card on Map */
+.gmap-nav-panel {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1000;
+  width: 350px;
+  max-width: calc(100% - 28px);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0,0,0,0.08);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.gmap-nav-header {
+  background: #ffffff;
+  padding: 0.65rem 0.75rem 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.gmap-transport-tabs {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.gmap-tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.45rem 0.3rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.gmap-tab-btn:hover {
+  color: #0f172a;
+}
+
+.gmap-tab-btn.active {
+  background: #ffffff;
+  color: #1e3a8a;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.gmap-tab-btn .tab-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.gmap-tab-btn .tab-title {
+  font-size: 0.68rem;
+}
+
+.gmap-nav-body {
+  padding: 1rem 1rem 0.85rem;
+}
+
+.gmap-route-headline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.gmap-eta-time {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #15803d; /* Google maps green */
+  letter-spacing: -0.02em;
+}
+
+.gmap-eta-time.heavy {
+  color: #dc2626; /* Heavy traffic red */
+}
+
+.gmap-eta-time.moderate {
+  color: #d97706; /* Amber */
+}
+
+.gmap-distance-badge {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.gmap-route-via {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.gmap-traffic-alert-box {
+  background: #fff7ed;
+  border-left: 3px solid #f97316;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #9a3412;
+}
+
+.gmap-traffic-alert-box.green {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.gmap-traffic-alert-box.transit {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.gmap-actions-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.gmap-btn-start {
+  flex: 1;
+  background: #1a73e8; /* Google blue */
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.6rem 1rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 10px rgba(26, 115, 232, 0.3);
+  transition: all 0.2s ease;
+}
+
+.gmap-btn-start:hover {
+  background: #1557b0;
+  transform: translateY(-1px);
+}
+
+.gmap-btn-traffic-toggle {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 9999px;
+  padding: 0.6rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.gmap-btn-traffic-toggle.active {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #15803d;
+  font-weight: 700;
+}
+
+/* Simulation HUD Banner at Top */
+.gmap-sim-hud {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  background: #0d652d; /* Google Maps Nav Green Header */
+  color: #ffffff;
+  padding: 0.75rem 1.4rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-width: 320px;
+  animation: slideDown 0.3s ease;
+}
+
+.gmap-sim-arrow {
+  font-size: 1.8rem;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.gmap-sim-info h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin: 0;
+  color: #ffffff;
+}
+
+.gmap-sim-info p {
+  font-size: 0.75rem;
+  margin: 2px 0 0;
+  color: #bbf7d0;
+}
+
+.gmap-sim-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gmap-sim-close-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Traffic Legend Box on Bottom Left */
+.gmap-traffic-legend {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.legend-bar-container {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.legend-bar-seg {
+  width: 14px;
+  height: 5px;
+  border-radius: 2px;
+}
+
+.legend-bar-seg.green { background: #22c55e; }
+.legend-bar-seg.yellow { background: #f59e0b; }
+.legend-bar-seg.red { background: #ef4444; }
+
+/* Pulsing Incident Markers */
+.traffic-incident-pulse {
+  background: #ef4444;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #ffffff;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: pulse-red 1.8s infinite;
+  cursor: pointer;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Vehicle Simulation Marker */
+.vehicle-sim-marker {
+  font-size: 1.8rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  transition: transform 0.2s linear;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+

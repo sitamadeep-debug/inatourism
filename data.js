@@ -1012,3 +1012,485 @@ window.COURSES = {
     { id: "c_plg_1", name: "Urban Riverway Tourism", code: "URT-304", students: 33, activeTour: "Musi Riverways & Heritage Legends" }
   ]
 };
+
+// -------------------------------------------------------------
+// REAL ROAD NETWORKS, TRAFFIC SIMULATION & MULTI-MODAL ROUTING
+// -------------------------------------------------------------
+window.ROUTING_NETWORK = {
+  bali: {
+    modes: {
+      driving: {
+        id: "driving",
+        name: { en: "Car / Tourism Van", id: "Mobil / Minibus Wisata" },
+        icon: "🚗",
+        color: "#3b82f6",
+        totalTime: "5 jam 25 mnt",
+        totalDistance: "234 km",
+        trafficDelay: "+45 mnt keterlambatan",
+        statusText: {
+          en: "Heavy traffic at Sunset Road Kuta and Tegallalang tourism corridor. Rest of the route is flowing normally.",
+          id: "Macet padat di Simpang Sunset Road Kuta & antrean wisata Tegallalang. Jalur pegunungan Plaga & Tol Laut lancar."
+        },
+        fuelCost: "Rp 210.000 (Pertalite/Solar)",
+        roadType: { en: "Highways, Tollways & Provincial Roads", id: "Jalan Nasional, Tol Bali Mandara & Arteri Provinsi" }
+      },
+      transit: {
+        id: "transit",
+        name: { en: "Train & Public Transit", id: "Kereta Api & Bus Transit" },
+        icon: "🚆",
+        color: "#10b981",
+        totalTime: "6 jam 45 mnt",
+        totalDistance: "248 km",
+        trafficDelay: "Jadwal Terjadwal (Interval 20 mnt)",
+        statusText: {
+          en: "⚠️ Rail Status: Bali currently does not have an active railway network. Feasibility studies for Bali LRT (Airport - Kuta - Seminyak) and Bedugul Cable Car are underway. Transit in this simulation operates via Tourism Shuttle Buses (Kura-Kura Bus & Teman Bus Trans Sarbagita Koridor 1 & 2).",
+          id: "⚠️ Info Kereta: Pulau Bali saat ini belum memiliki jaringan rel kereta api aktif (Rencana LRT Bali Bandara-Kuta-Seminyak sedang dalam studi DED). Rute transit dilayani oleh Shuttle Bus Pariwisata & Bus Trans Sarbagita Koridor 1 & 2 terintegrasi."
+        },
+        fuelCost: "Rp 35.000 / Penumpang (Kartu E-Money)",
+        roadType: { en: "Trans Sarbagita Corridors & Tourism Shuttles", id: "Koridor Trans Sarbagita & Shuttle Wisata" }
+      },
+      motorcycle: {
+        id: "motorcycle",
+        name: { en: "Motorcycle / Scooter", id: "Sepeda Motor / Matic" },
+        icon: "🛵",
+        color: "#f59e0b",
+        totalTime: "4 jam 30 mnt",
+        totalDistance: "218 km",
+        trafficDelay: "+15 mnt keterlambatan",
+        statusText: {
+          en: "Utilizing famous Bali shortcuts (Canggu & Ubud rural paths). Bypasses 65% of main vehicular congestion.",
+          id: "Menggunakan jalan pintas (Bali Shortcuts) di Canggu & jalur pedesaan Ubud. Menghemat ~55 menit dari macet mobil."
+        },
+        fuelCost: "Rp 65.000",
+        roadType: { en: "Scenic Rural Byways & Shortcuts", id: "Jalan Pedesaan & Pintasan Khusus Motor" }
+      },
+      walking: {
+        id: "walking",
+        name: { en: "Walking / Eco Trails", id: "Jalan Kaki / Eco-Trail" },
+        icon: "🚶",
+        color: "#8b5cf6",
+        totalTime: "Studi per Zona",
+        totalDistance: "14,5 km Total Jalur Setapak",
+        trafficDelay: "Bebas Macet",
+        statusText: {
+          en: "Dedicated pedestrian boardwalks, Jatiluwih Subak terrace trails, and Penglipuran bamboo forest walkways.",
+          id: "Jalur setapak pejalan kaki pematang Subak Jatiluwih, lorong desa Penglipuran, dan anak tangga tebing Uluwatu."
+        },
+        fuelCost: "Rp 0 (Jalan Sehat)",
+        roadType: { en: "Pedestrian Boardwalks & Village Trails", id: "Jalur Setapak Pedestrian & Pematang Sawah" }
+      }
+    },
+    transitHubs: [
+      { name: "Terminal Bus Mengwi (Hub Antar-Kota)", coords: [-8.5512, 115.1742], type: "Bus Terminal", info: "Hub Bus Utama Bali & Shuttle Transit" },
+      { name: "Halte Sentral Parkir Kuta", coords: [-8.7088, 115.1785], type: "Transit Stop", info: "Halte Trans Sarbagita Koridor 2" },
+      { name: "Halte Batubulan Gianyar", coords: [-8.6189, 115.2638], type: "Transit Stop", info: "Terminal Angkutan Wisata Timur" },
+      { name: "Shuttle Stop Pasar Candikuning Bedugul", coords: [-8.2785, 115.1620], type: "Shuttle Station", info: "Pemberhentian Shuttle Dataran Tinggi" },
+      { name: "Stasiun Rencana LRT Bali (Bandara I Gusti Ngurah Rai)", coords: [-8.7482, 115.1672], type: "Future Rail", info: "Proyeksi Stasiun LRT Bali Bawah Tanah (Fase 1)" }
+    ],
+    incidents: [
+      {
+        id: "inc_1",
+        title: { en: "Heavy Traffic: Sunset Road / Dewa Ruci Kuta", id: "Macet Padat: Simpang Dewa Ruci / Sunset Road" },
+        desc: { en: "Congestion due to high volume of tourist vehicles heading to Kuta/Seminyak.", id: "Antrean panjang kendaraan wisata menuju Kuta/Seminyak. Kecepatan 10-15 km/jam." },
+        delay: "+18 mnt",
+        coords: [-8.7050, 115.1850],
+        severity: "heavy"
+      },
+      {
+        id: "inc_2",
+        title: { en: "Moderate Delay: Pasar Kediri Tabanan", id: "Padat Merayap: Jalur Pasar Kediri Tabanan" },
+        desc: { en: "Morning market activity and local transport crossing.", id: "Aktivitas pasar tradisional dan perlintasan angkutan lokal. Kecepatan 20-25 km/jam." },
+        delay: "+12 mnt",
+        coords: [-8.5580, 115.1380],
+        severity: "moderate"
+      },
+      {
+        id: "inc_3",
+        title: { en: "Road Maintenance: Luwus Bedugul", id: "Perbaikan Jalan: Kawasan Luwus Bedugul" },
+        desc: { en: "Asphalt resurfacing work on left lane. Alternating one-way traffic.", id: "Pekerjaan pengaspalan jalur kiri. Buka-tutup jalur bergantian." },
+        delay: "+8 mnt",
+        coords: [-8.3550, 115.1830],
+        severity: "moderate"
+      },
+      {
+        id: "inc_4",
+        title: { en: "Tourist Density: Tegallalang Ubud Strip", id: "Kepadatan Wisata: Jalur Ceking Tegallalang" },
+        desc: { en: "Tour buses parking along scenic terrace viewpoints.", id: "Parkir bus pariwisata dan penyeberang jalan di spot foto terasering. Kecepatan 12 km/jam." },
+        delay: "+15 mnt",
+        coords: [-8.4310, 115.2950],
+        severity: "heavy"
+      }
+    ],
+    segments: [
+      {
+        fromId: "bali_uluwatu",
+        toId: "bali_tanahlot",
+        fromName: "Pura Luhur Uluwatu",
+        toName: "Pura Tanah Lot",
+        distanceKm: 48.2,
+        durationDriving: "1 jam 35 mnt",
+        via: "Jl. By Pass Ngurah Rai & Jl. Raya Canggu",
+        steps: [
+          { text: "Berangkat dari Pura Uluwatu menyusuri Jl. Raya Uluwatu Pecatu ke arah Ungasan (12 km)", traffic: "smooth" },
+          { text: "Turun melintasi bukit Jimbaran menuju By Pass Ngurah Rai (8 km)", traffic: "smooth" },
+          { text: "Masuk kawasan Sunset Road / Simpang Dewa Ruci Kuta (Macet Padat +18 mnt)", traffic: "heavy" },
+          { text: "Belok ke arah Kerobokan dan jalan arteri Canggu - Munggu (14 km)", traffic: "moderate" },
+          { text: "Tiba di kawasan Pura Tanah Lot melalui Jl. By Pass Tanah Lot (6 km)", traffic: "smooth" }
+        ],
+        subSegments: [
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.8291, 115.0849], [-8.8210, 115.0935], [-8.8142, 115.1050],
+              [-8.8055, 115.1180], [-8.7960, 115.1365], [-8.7845, 115.1520],
+              [-8.7720, 115.1645], [-8.7510, 115.1725], [-8.7305, 115.1780],
+              [-8.7180, 115.1820]
+            ]
+          },
+          {
+            status: "heavy",
+            color: "#ef4444",
+            coords: [
+              [-8.7180, 115.1820], [-8.7050, 115.1850], [-8.6925, 115.1790],
+              [-8.6815, 115.1685]
+            ]
+          },
+          {
+            status: "moderate",
+            color: "#f59e0b",
+            coords: [
+              [-8.6815, 115.1685], [-8.6650, 115.1580], [-8.6480, 115.1410]
+            ]
+          },
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.6480, 115.1410], [-8.6360, 115.1220], [-8.6290, 115.1030],
+              [-8.6212, 115.0868]
+            ]
+          }
+        ]
+      },
+      {
+        fromId: "bali_tanahlot",
+        toId: "bali_jatiluwih",
+        fromName: "Pura Tanah Lot",
+        toName: "Terasering Padi Jatiluwih",
+        distanceKm: 38.6,
+        durationDriving: "1 jam 15 mnt",
+        via: "Jl. Raya Kediri & Jl. Raya Penebel",
+        steps: [
+          { text: "Keluar dari Tanah Lot menuju Beraban dan Pandak Gede (9 km)", traffic: "smooth" },
+          { text: "Melintasi Pasar Kediri & Pusat Kota Tabanan (Padat Merayap +12 mnt)", traffic: "moderate" },
+          { text: "Masuk jalur perbukitan Jl. Raya Penebel ke Babahan (15 km)", traffic: "smooth" },
+          { text: "Menanjak melalui Senganan menuju Terasering Jatiluwih (7 km)", traffic: "smooth" }
+        ],
+        subSegments: [
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.6212, 115.0868], [-8.6110, 115.1020], [-8.5940, 115.1180],
+              [-8.5750, 115.1290]
+            ]
+          },
+          {
+            status: "moderate",
+            color: "#f59e0b",
+            coords: [
+              [-8.5750, 115.1290], [-8.5580, 115.1380], [-8.5410, 115.1360]
+            ]
+          },
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.5410, 115.1360], [-8.5220, 115.1390], [-8.5020, 115.1415],
+              [-8.4710, 115.1435], [-8.4410, 115.1425], [-8.4120, 115.1390],
+              [-8.3880, 115.1345], [-8.3687, 115.1311]
+            ]
+          }
+        ]
+      },
+      {
+        fromId: "bali_jatiluwih",
+        toId: "bali_ulundanu",
+        fromName: "Terasering Padi Jatiluwih",
+        toName: "Pura Ulun Danu Beratan",
+        distanceKm: 22.4,
+        durationDriving: "45 mnt",
+        via: "Jl. Pacung & Arteri Denpasar-Singaraja",
+        steps: [
+          { text: "Menyusuri lereng timur Jatiluwih menuju Pacung (8 km)", traffic: "smooth" },
+          { text: "Zona perbaikan jalan aspal di kawasan Luwus Baturiti (+8 mnt)", traffic: "moderate" },
+          { text: "Jalur utama dataran tinggi Baturiti menuju gerbang Kebun Raya (9 km)", traffic: "smooth" },
+          { text: "Tiba di tepi Danau Beratan / Pura Ulun Danu Bedugul", traffic: "smooth" }
+        ],
+        subSegments: [
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.3687, 115.1311], [-8.3790, 115.1450], [-8.3840, 115.1610],
+              [-8.3710, 115.1760]
+            ]
+          },
+          {
+            status: "moderate",
+            color: "#f59e0b",
+            coords: [
+              [-8.3710, 115.1760], [-8.3550, 115.1830], [-8.3380, 115.1850]
+            ]
+          },
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.3380, 115.1850], [-8.3120, 115.1790], [-8.2930, 115.1710],
+              [-8.2785, 115.1660], [-8.2752, 115.1656]
+            ]
+          }
+        ]
+      },
+      {
+        fromId: "bali_ulundanu",
+        toId: "bali_tirtaempul",
+        fromName: "Pura Ulun Danu Beratan",
+        toName: "Pura Tirta Empul",
+        distanceKm: 44.8,
+        durationDriving: "1 jam 20 mnt",
+        via: "Jembatan Tukad Bangkung Plaga & Payangan",
+        steps: [
+          { text: "Turun dari Bedugul belok kiri melintasi pegunungan Nungnung (12 km)", traffic: "smooth" },
+          { text: "Melintasi Jembatan Tukad Bangkung Plaga (Jembatan Tertinggi di Bali)", traffic: "smooth" },
+          { text: "Menyusuri lembah hijau Petang & Payangan (16 km)", traffic: "smooth" },
+          { text: "Melewati jalur wisata Tegallalang Ceking (Padat Macet +15 mnt)", traffic: "heavy" },
+          { text: "Tiba di kawasan Pura Tirta Empul Tampaksiring", traffic: "smooth" }
+        ],
+        subSegments: [
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.2752, 115.1656], [-8.2910, 115.1710], [-8.3120, 115.1820],
+              [-8.3240, 115.2050], [-8.3285, 115.2210], [-8.3410, 115.2340],
+              [-8.3680, 115.2320], [-8.3980, 115.2410], [-8.4150, 115.2510],
+              [-8.4320, 115.2630], [-8.4410, 115.2810]
+            ]
+          },
+          {
+            status: "heavy",
+            color: "#ef4444",
+            coords: [
+              [-8.4410, 115.2810], [-8.4310, 115.2950]
+            ]
+          },
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.4310, 115.2950], [-8.4210, 115.3080], [-8.4149, 115.3155]
+            ]
+          }
+        ]
+      },
+      {
+        fromId: "bali_tirtaempul",
+        toId: "bali_penglipuran",
+        fromName: "Pura Tirta Empul",
+        toName: "Desa Wisata Penglipuran",
+        distanceKm: 16.5,
+        durationDriving: "30 mnt",
+        via: "Jl. Raya Kayuambua & Kubu Bangli",
+        steps: [
+          { text: "Dari Tampaksiring mengarah ke utara lereng Kintamani (6 km)", traffic: "smooth" },
+          { text: "Belok ke jalur agrikultur Kayuambua (5 km)", traffic: "smooth" },
+          { text: "Memasuki kawasan asri Hutan Bambu & Desa Penglipuran Bangli (5 km)", traffic: "smooth" }
+        ],
+        subSegments: [
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.4149, 115.3155], [-8.4050, 115.3260], [-8.3990, 115.3390],
+              [-8.4060, 115.3510], [-8.4220, 115.3540], [-8.4410, 115.3565],
+              [-8.4526, 115.3582]
+            ]
+          }
+        ]
+      },
+      {
+        fromId: "bali_penglipuran",
+        toId: "bali_uluwatu",
+        fromName: "Desa Wisata Penglipuran",
+        toName: "Pura Luhur Uluwatu",
+        distanceKm: 64.8,
+        durationDriving: "1 jam 45 mnt",
+        via: "By Pass Mantra, Tol Bali Mandara & Jimbaran",
+        steps: [
+          { text: "Turun dari Kota Bangli menuju Pusat Gianyar (16 km)", traffic: "smooth" },
+          { text: "Melaju di By Pass Pesisir Timur Ida Bagus Mantra (20 km)", traffic: "moderate" },
+          { text: "Menyeberangi teluk lewat Jalan Tol Laut Bali Mandara (12 km - Lancar)", traffic: "smooth" },
+          { text: "Naik ke bukit Ungasan & Pecatu menuju Pura Uluwatu (16 km)", traffic: "smooth" }
+        ],
+        subSegments: [
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.4526, 115.3582], [-8.4710, 115.3540], [-8.5050, 115.3480],
+              [-8.5390, 115.3340]
+            ]
+          },
+          {
+            status: "moderate",
+            color: "#f59e0b",
+            coords: [
+              [-8.5390, 115.3340], [-8.5720, 115.3250], [-8.5980, 115.3120],
+              [-8.6320, 115.2780], [-8.6650, 115.2590]
+            ]
+          },
+          {
+            status: "smooth",
+            color: "#22c55e",
+            coords: [
+              [-8.6650, 115.2590], [-8.6920, 115.2510], [-8.7210, 115.2340],
+              [-8.7450, 115.2050], [-8.7680, 115.1810], [-8.7880, 115.1580],
+              [-8.8050, 115.1380], [-8.8190, 115.1050], [-8.8291, 115.0849]
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  nhi_bandung: {
+    modes: {
+      driving: {
+        id: "driving",
+        name: { en: "Car / Van", id: "Mobil / Van" },
+        icon: "🚗",
+        color: "#3b82f6",
+        totalTime: "2 jam 15 mnt",
+        totalDistance: "62 km",
+        trafficDelay: "+25 mnt (Kepadatan Kopo & Soreang)",
+        statusText: {
+          en: "Heavy traffic at Kopo toll exit & Soreang-Ciwidey weekend tourist corridor.",
+          id: "Padat merayap di Gerbang Tol Kopo & jalur wisata Soreang menuju Ciwidey."
+        },
+        fuelCost: "Rp 85.000",
+        roadType: { en: "Soroja Tollway & Ciwidey Mountain Pass", id: "Tol Soroja & Jalan Raya Ciwidey" }
+      },
+      transit: {
+        id: "transit",
+        name: { en: "Whoosh Fast Train & Transit", id: "Kereta Cepat Whoosh & Kereta Komuter" },
+        icon: "🚄",
+        color: "#10b981",
+        totalTime: "1 jam 40 mnt",
+        totalDistance: "Kereta Cepat + Shuttle",
+        trafficDelay: "Tepat Waktu (Kereta Cepat)",
+        statusText: {
+          en: "🚅 Kereta Cepat Whoosh rute Jakarta (Halim) - Bandung (Padalarang/Tegalluar) tersambung KA Feeder ke Stasiun Bandung & Shuttle Pariwisata Ciwidey.",
+          id: "🚅 Kereta Cepat Whoosh (Halim - Padalarang) terintegrasi KA Feeder Stasiun Bandung & Shuttle Minibus Wisata Kawah Putih."
+        },
+        fuelCost: "Rp 250.000 (Tiket Whoosh Premium)",
+        roadType: { en: "High-Speed Rail & Feeder Line", id: "Rel Kereta Cepat & Jalur Pengumpan" }
+      }
+    }
+  },
+  palembang: {
+    modes: {
+      driving: {
+        id: "driving",
+        name: { en: "Car / Bus", id: "Mobil / Bus Wisata" },
+        icon: "🚗",
+        color: "#3b82f6",
+        totalTime: "1 jam 10 mnt",
+        totalDistance: "28 km",
+        trafficDelay: "+15 mnt Jembatan Ampera",
+        statusText: { en: "Ampera Bridge traffic congestion during peak hours.", id: "Kepadatan di seputar Jembatan Ampera dan Pasar 16 Ilir." },
+        fuelCost: "Rp 40.000",
+        roadType: { en: "Sudirman Artery & Ampera Span", id: "Jl. Jenderal Sudirman & Jembatan Ampera" }
+      },
+      transit: {
+        id: "transit",
+        name: { en: "LRT South Sumatra", id: "LRT Sumatera Selatan" },
+        icon: "🚝",
+        color: "#10b981",
+        totalTime: "35 mnt (Bebas Macet)",
+        totalDistance: "23,4 km Rel Layang",
+        trafficDelay: "0 mnt (Jalur Layang Khusus)",
+        statusText: {
+          en: "🚝 LRT Sumsel connects Airport (SMB II) to Ampera and Jakabaring Sport City in 35 mins without road congestion.",
+          id: "🚝 Jalur LRT Sumatera Selatan (Stasiun Bandara SMB II - Ampera - Jakabaring) bebas macet dengan tarif Rp 10.000."
+        },
+        fuelCost: "Rp 10.000 (Tiket LRT)",
+        roadType: { en: "Elevated Light Rail Transit Line", id: "Jalur Kereta Api Ringan Layang" }
+      }
+    }
+  },
+  makassar: {
+    modes: {
+      driving: {
+        id: "driving",
+        name: { en: "Car / Bus", id: "Mobil / Angkutan Kota" },
+        icon: "🚗",
+        color: "#3b82f6",
+        totalTime: "1 jam 45 mnt",
+        totalDistance: "55 km",
+        trafficDelay: "+20 mnt Daya/Maros",
+        statusText: { en: "Congestion around Daya terminal & Maros market.", id: "Kepadatan di simpang Terminal Daya dan Pasar Maros." },
+        fuelCost: "Rp 70.000",
+        roadType: { en: "Trans-Sulawesi Highway", id: "Jalan Poros Trans-Sulawesi" }
+      },
+      transit: {
+        id: "transit",
+        name: { en: "Trans-Sulawesi Railway", id: "Kereta Api Trans-Sulawesi" },
+        icon: "🚆",
+        color: "#10b981",
+        totalTime: "40 mnt",
+        totalDistance: "Jalur Kereta Mandai-Maros-Pangkep",
+        trafficDelay: "Bebas Macet",
+        statusText: {
+          en: "🚆 Jalur Kereta Api Pertama di Sulawesi rute Stasiun Mandai - Stasiun Maros - Stasiun Rammang-Rammang (Geopark UNESCO).",
+          id: "🚆 Kereta Api Trans-Sulawesi rute Mandai ke Stasiun Rammang-Rammang (Geopark Karst Maros-Pangkep) menyuguhkan panorama karst menawan."
+        },
+        fuelCost: "Rp 10.000 (Subsidi PSO)",
+        roadType: { en: "Trans-Sulawesi Scenic Rail", id: "Jalur Kereta Api Pesisir & Karst" }
+      }
+    }
+  },
+  medan: {
+    modes: {
+      driving: {
+        id: "driving",
+        name: { en: "Car / Van", id: "Mobil / Rental" },
+        icon: "🚗",
+        color: "#3b82f6",
+        totalTime: "4 jam 15 mnt",
+        totalDistance: "165 km",
+        trafficDelay: "+30 mnt Tebing Tinggi",
+        statusText: { en: "Tollway to Tebing Tinggi, followed by Parapat mountain climb.", id: "Tol Trans-Sumatera lancar, disusul jalur berliku Parapat Danau Toba." },
+        fuelCost: "Rp 180.000",
+        roadType: { en: "Trans-Sumatra Tollway & Parapat Highway", id: "Tol Tebing Tinggi & Lintas Parapat" }
+      },
+      transit: {
+        id: "transit",
+        name: { en: "Railink & Toba Train", id: "Kereta Bandara Railink & KA Toba" },
+        icon: "🚆",
+        color: "#10b981",
+        totalTime: "2 jam 30 mnt",
+        totalDistance: "Rel Medan - Siantar + Bus",
+        trafficDelay: "Bebas Macet",
+        statusText: {
+          en: "🚆 KA Siantar Ekspres & Kereta Bandara Railink Medan terhubung ke Shuttle Damri Danau Toba.",
+          id: "🚆 Kereta Api Siantar Ekspres & Railink terhubung shuttle DAMRI langsung ke Pelabuhan Danau Toba."
+        },
+        fuelCost: "Rp 45.000",
+        roadType: { en: "Rail Line & Toba Ferry Shuttle", id: "Jalur Rel & Angkutan Danau" }
+      }
+    }
+  }
+};
+
