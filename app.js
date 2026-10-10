@@ -15,6 +15,8 @@ const state = {
   pathMode: true, // draw route lines
   transportMode: localStorage.getItem('edutour_transport_mode') || 'driving', // 'driving' | 'transit' | 'motorcycle' | 'walking'
   trafficLayer: localStorage.getItem('edutour_traffic_layer') !== 'false', // boolean: show traffic conditions & live traffic tiles
+  navPanelCollapsed: localStorage.getItem('edutour_nav_collapsed') === 'true',
+  navPanelHidden: localStorage.getItem('edutour_nav_hidden') === 'true',
   isSimulating: false,
   simIndex: 0,
   simTimer: null,
@@ -55,6 +57,8 @@ function saveState() {
   localStorage.setItem('edutour_lang', state.lang);
   localStorage.setItem('edutour_transport_mode', state.transportMode);
   localStorage.setItem('edutour_traffic_layer', state.trafficLayer);
+  localStorage.setItem('edutour_nav_collapsed', state.navPanelCollapsed);
+  localStorage.setItem('edutour_nav_hidden', state.navPanelHidden);
   localStorage.setItem('edutour_comments', JSON.stringify(state.comments));
   localStorage.setItem('edutour_checklists', JSON.stringify(state.checklists));
   localStorage.setItem('edutour_tasks', JSON.stringify(state.tasks));
@@ -1028,31 +1032,55 @@ function renderExplorer(container) {
       <div class="map-center-panel" style="position:relative;">
         <div id="map-canvas" class="map-container"></div>
 
-        <!-- 1. Google Maps Navigation HUD Card -->
-        <div class="gmap-nav-panel" id="gmap-nav-panel">
-          <div class="gmap-nav-header">
-            <div class="gmap-transport-tabs">
-              <button class="gmap-tab-btn ${state.transportMode === 'driving' ? 'active' : ''}" data-mode="driving" title="${isId ? 'Mobil & Minibus Wisata' : 'Car / Driving'}">
-                <span class="tab-icon">🚗</span>
-                <span class="tab-title">${isId ? 'Mobil' : 'Drive'}</span>
+        <!-- Floating Reopen Navigation Button (Shown when HUD panel is hidden) -->
+        <button class="gmap-nav-reopen-btn ${state.navPanelHidden ? '' : 'hidden'}" id="gmap-nav-reopen-btn" title="${isId ? 'Tampilkan Navigasi & Rute' : 'Show Route Navigation'}">
+          <span class="icon">🧭</span>
+          <span>${isId ? 'Buka Navigasi Rute' : 'Show Route Navigation'}</span>
+        </button>
+
+        <!-- 1. Google Maps Navigation HUD Card (Collapsible & Closeable) -->
+        <div class="gmap-nav-panel ${state.navPanelCollapsed ? 'collapsed' : ''} ${state.navPanelHidden ? 'hidden' : ''}" id="gmap-nav-panel">
+          <div class="gmap-nav-topbar" id="gmap-nav-topbar" title="${isId ? 'Klik untuk memperluas / mengecilkan panel' : 'Click to expand / collapse panel'}">
+            <div class="gmap-nav-topbar-title">
+              <span class="nav-icon">🧭</span>
+              <span class="nav-title-text">${isId ? 'Navigasi & Rute' : 'Navigation & Route'}</span>
+              <span class="gmap-collapsed-badge" id="gmap-collapsed-badge"></span>
+            </div>
+            <div class="gmap-nav-actions">
+              <button class="gmap-header-btn" id="gmap-btn-collapse" type="button" title="${state.navPanelCollapsed ? (isId ? 'Perluas Panel' : 'Expand') : (isId ? 'Kecilkan Panel' : 'Collapse')}">
+                ${state.navPanelCollapsed ? '▼' : '▲'}
               </button>
-              <button class="gmap-tab-btn ${state.transportMode === 'transit' ? 'active' : ''}" data-mode="transit" title="${isId ? 'Kereta Api & Angkutan Massal' : 'Train & Transit'}">
-                <span class="tab-icon">🚆</span>
-                <span class="tab-title">${isId ? 'Kereta/Bus' : 'Transit'}</span>
-              </button>
-              <button class="gmap-tab-btn ${state.transportMode === 'motorcycle' ? 'active' : ''}" data-mode="motorcycle" title="${isId ? 'Sepeda Motor (Shortcut)' : 'Motorbike'}">
-                <span class="tab-icon">🛵</span>
-                <span class="tab-title">${isId ? 'Motor' : 'Moto'}</span>
-              </button>
-              <button class="gmap-tab-btn ${state.transportMode === 'walking' ? 'active' : ''}" data-mode="walking" title="${isId ? 'Jalan Kaki / Eco-Trail' : 'Walking'}">
-                <span class="tab-icon">🚶</span>
-                <span class="tab-title">${isId ? 'Jalan' : 'Walk'}</span>
+              <button class="gmap-header-btn close" id="gmap-btn-hide" type="button" title="${isId ? 'Sembunyikan Panel' : 'Hide Panel'}">
+                ✕
               </button>
             </div>
           </div>
 
-          <div class="gmap-nav-body" id="gmap-nav-body">
-            <!-- Dynamic routing summary content rendered by updateGMapNavCard -->
+          <div class="gmap-nav-collapsible" id="gmap-nav-collapsible">
+            <div class="gmap-nav-header">
+              <div class="gmap-transport-tabs">
+                <button class="gmap-tab-btn ${state.transportMode === 'driving' ? 'active' : ''}" data-mode="driving" title="${isId ? 'Mobil & Minibus Wisata' : 'Car / Driving'}">
+                  <span class="tab-icon">🚗</span>
+                  <span class="tab-title">${isId ? 'Mobil' : 'Drive'}</span>
+                </button>
+                <button class="gmap-tab-btn ${state.transportMode === 'transit' ? 'active' : ''}" data-mode="transit" title="${isId ? 'Kereta Api & Angkutan Massal' : 'Train & Transit'}">
+                  <span class="tab-icon">🚆</span>
+                  <span class="tab-title">${isId ? 'Kereta/Bus' : 'Transit'}</span>
+                </button>
+                <button class="gmap-tab-btn ${state.transportMode === 'motorcycle' ? 'active' : ''}" data-mode="motorcycle" title="${isId ? 'Sepeda Motor (Shortcut)' : 'Motorbike'}">
+                  <span class="tab-icon">🛵</span>
+                  <span class="tab-title">${isId ? 'Motor' : 'Moto'}</span>
+                </button>
+                <button class="gmap-tab-btn ${state.transportMode === 'walking' ? 'active' : ''}" data-mode="walking" title="${isId ? 'Jalan Kaki / Eco-Trail' : 'Walking'}">
+                  <span class="tab-icon">🚶</span>
+                  <span class="tab-title">${isId ? 'Jalan' : 'Walk'}</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="gmap-nav-body" id="gmap-nav-body">
+              <!-- Dynamic routing summary content rendered by updateGMapNavCard -->
+            </div>
           </div>
         </div>
 
@@ -1149,6 +1177,58 @@ function renderExplorer(container) {
     });
   }
 
+  // Attach Panel Collapse & Hide Actions
+  const navPanel = document.getElementById('gmap-nav-panel');
+  const collapseBtn = document.getElementById('gmap-btn-collapse');
+  const topbar = document.getElementById('gmap-nav-topbar');
+  const hideBtn = document.getElementById('gmap-btn-hide');
+  const reopenBtn = document.getElementById('gmap-nav-reopen-btn');
+
+  function toggleCollapse(e) {
+    if (e) e.stopPropagation();
+    state.navPanelCollapsed = !state.navPanelCollapsed;
+    saveState();
+    if (navPanel) {
+      navPanel.classList.toggle('collapsed', state.navPanelCollapsed);
+    }
+    if (collapseBtn) {
+      collapseBtn.textContent = state.navPanelCollapsed ? '▼' : '▲';
+      collapseBtn.title = state.navPanelCollapsed ? (isId ? 'Perluas Panel' : 'Expand') : (isId ? 'Kecilkan Panel' : 'Collapse');
+    }
+  }
+
+  if (collapseBtn) {
+    collapseBtn.addEventListener('click', toggleCollapse);
+  }
+
+  if (topbar) {
+    topbar.addEventListener('click', (e) => {
+      if (e.target.closest('#gmap-btn-hide') || e.target.closest('#gmap-btn-collapse')) return;
+      if (state.navPanelCollapsed) {
+        toggleCollapse(e);
+      }
+    });
+  }
+
+  if (hideBtn) {
+    hideBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.navPanelHidden = true;
+      saveState();
+      if (navPanel) navPanel.classList.add('hidden');
+      if (reopenBtn) reopenBtn.classList.remove('hidden');
+    });
+  }
+
+  if (reopenBtn) {
+    reopenBtn.addEventListener('click', () => {
+      state.navPanelHidden = false;
+      saveState();
+      if (navPanel) navPanel.classList.remove('hidden');
+      if (reopenBtn) reopenBtn.classList.add('hidden');
+    });
+  }
+
   // Initial Content Population
   updateGMapNavCard();
   renderExplorerDetails();
@@ -1210,6 +1290,12 @@ function updateGMapNavCard() {
     </div>
   `;
 
+  // Update collapsed badge text
+  const collapsedBadge = document.getElementById('gmap-collapsed-badge');
+  if (collapsedBadge) {
+    collapsedBadge.textContent = `${modeData.icon} ${modeData.totalTime} • ${modeData.totalDistance}`;
+  }
+
   // Attach start navigation button
   const startBtn = document.getElementById('gmap-start-sim-btn');
   if (startBtn) {
@@ -1263,8 +1349,13 @@ function initLeafletMap() {
     mapInstance = null;
   }
 
-  // Initialize Leaflet Map
-  mapInstance = L.map('map-canvas').setView(activeDest.coords, 11);
+  // Initialize Leaflet Map without default zoom control (default is topleft which clashes with nav HUD)
+  mapInstance = L.map('map-canvas', {
+    zoomControl: false
+  }).setView(activeDest.coords, 11);
+
+  // Position zoom controls cleanly at bottom-right corner
+  L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
   // --- GOOGLE MAPS TILE LAYERS (High Quality, Clean, No Watermarks) ---
   googleStreetsTile = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
