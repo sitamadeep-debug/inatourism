@@ -552,16 +552,12 @@ function renderNavbar() {
         <button class="role-btn ${state.lang === 'id' ? 'active' : ''}" id="lang-id-btn">ID</button>
       </div>
 
-      <!-- Supabase Setup Button -->
-      <button class="role-btn" id="supabase-config-btn" style="background:${isSupabaseConnected ? '#10b981' : '#3b82f6'}; color:white; padding: 0.4rem 0.8rem;">
-        ${isSupabaseConnected ? '⚡ Supabase (Live)' : '⚡ Supabase'}
-      </button>
-
       <button class="role-btn" id="logout-btn" style="background:#e2e8f0; color:#475569; padding: 0.4rem 0.8rem;">${t('logout')}</button>
     </div>
   `;
 
-  document.getElementById('supabase-config-btn').addEventListener('click', () => {
+  // Expose configuration function globally via console if ever needed (without cluttering UI)
+  window.configureSupabase = () => {
     const currentUrl = localStorage.getItem('supabase_url') || '';
     const currentKey = localStorage.getItem('supabase_anon_key') || '';
     
@@ -581,7 +577,7 @@ function renderNavbar() {
       alert("ℹ️ Configuration saved. The app will continue using Local Storage until valid credentials are verified.");
     }
     render();
-  });
+  };
 
   document.getElementById('nav-brand-btn').addEventListener('click', () => {
     state.isWelcome = true;
