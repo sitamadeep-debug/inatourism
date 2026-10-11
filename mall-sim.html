@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mall SIM SMKN Mojoagung - Single Sign-On (SSO) Portal</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏫</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --bg-device: #0f172a;
+      --bg-screen: #f4f7fb;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-icon: 22px;
+      --radius-card: 16px;
+      --shadow-sm: 0 2px 6px rgba(0,0,0,0.04);
+      --shadow-md: 0 8px 20px -4px rgba(0,0,0,0.08);
+      --shadow-icon: 0 6px 14px -2px rgba(0,0,0,0.07);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #0b1120;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.12) 0%, transparent 40%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+
+    /* Top Mode & Explainer Banner */
+    .top-explainer-bar {
+      max-width: 840px;
+      width: 100%;
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1rem 1.4rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      color: #e2e8f0;
+    }
+
+    .explainer-info h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .explainer-info p {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-top: 0.2rem;
+    }
+
+    .view-mode-toggle {
+      display: flex;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .mode-btn {
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      padding: 0.4rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Device Mockup Shell */
+    .device-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 412px;
+      background: #000000;
+      border-radius: 46px;
+      padding: 10px;
+      box-shadow: 
+        0 25px 60px -15px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .device-wrapper.desktop-view {
+      max-width: 960px;
+      border-radius: 24px;
+      padding: 6px;
+    }
+
+    .device-screen {
+      position: relative;
+      background: var(--bg-screen);
+      border-radius: 38px;
+      overflow: hidden;
+      height: 840px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+    }
+
+    .device-wrapper.desktop-view .device-screen {
+      border-radius: 18px;
+      height: 780px;
+    }
+
+    /* Phone Status Bar & Punch Hole */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1.6rem 0.2rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      position: relative;
+      z-index: 20;
+    }
+
+    .camera-punch {
+      width: 14px;
+      height: 14px;
+      background: #000000;
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      box-shadow: inset 0 0 2px rgba(255,255,255,0.3);
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+    }
+
+    /* Screen Scrollable Body */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem 1.25rem 5.5rem;
+      scroll-behavior: smooth;
+    }
+
+    .screen-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .screen-content::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    /* Header Brand SMKN Mojoagung */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+      padding-top: 0.25rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .brand-logo-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .brand-titles h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.15;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-titles p {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .sso-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    /* Search & Quick Filter Bar */
+    .search-bar-wrap {
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.65rem 1rem 0.65rem 2.4rem;
+      font-size: 0.82rem;
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Apps Launcher Grid - 4 columns like in screenshot */
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.15rem 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .device-wrapper.desktop-view .apps-grid {
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1.5rem 1rem;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .app-item:hover {
+      transform: translateY(-4px) scale(1.03);
+    }
+
+    .app-item:active {
+      transform: scale(0.95);
+    }
+
+    .app-icon-squircle {
+      width: 66px;
+      height: 66px;
+      border-radius: var(--radius-icon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.85rem;
+      box-shadow: var(--shadow-icon);
+      margin-bottom: 0.45rem;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      transition: box-shadow 0.2s;
+    }
+
+    .app-item:hover .app-icon-squircle {
+      box-shadow: 0 10px 20px -3px rgba(0,0,0,0.14);
+    }
+
+    .app-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.2;
+      max-width: 72px;
+      word-break: break-word;
+    }
+
+    .app-restricted-badge {
+      position: absolute;
+      top: -4px;
+      right: 4px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 9999px;
+      display: none;
+    }
+
+    .app-item.disabled {
+      opacity: 0.35;
+      filter: grayscale(0.85);
+      cursor: not-allowed;
+    }
+
+    .app-item.disabled .app-restricted-badge {
+      display: block;
+    }
+
+    /* Specific Icon Color Themes Matching Screenshot */
+    .icon-waka       { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); color: #fff; }
+    .icon-upj        { background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%); color: #fff; }
+    .icon-koperasi   { background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%); color: #fff; }
+    .icon-perpus     { background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); color: #fff; }
+    .icon-bkk        { background: linear-gradient(135deg, #34d399 0%, #059669 100%); color: #fff; }
+    .icon-pkl        { background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%); color: #fff; }
+    .icon-elearning  { background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); color: #fff; }
+    .icon-kokurikuler{ background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: #fff; }
+    .icon-kapro      { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); color: #fff; }
+    .icon-osis       { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #fff; }
+    .icon-kepegawaian{ background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%); color: #fff; }
+    .icon-bankmini   { background: linear-gradient(135deg, #818cf8 0%, #4f46e5 100%); color: #fff; }
+    .icon-komite     { background: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%); color: #fff; }
+    .icon-guru       { background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); color: #fff; }
+
+    /* Summary Widgets (Recent Activity & Quick Tasks) */
+    .dashboard-widgets-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .widget-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 0.9rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .widget-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .widget-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      padding: 0.35rem 0;
+      border-bottom: 1px dashed #f1f5f9;
+    }
+    .widget-item:last-child {
+      border-bottom: none;
+    }
+
+    .widget-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #eff6ff;
+      color: #1e40af;
+    }
+
+    /* Floating Profile Bar (SSO Identity Pill) */
+    .profile-sso-bar {
+      position: absolute;
+      bottom: 58px;
+      left: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      border-radius: 20px;
+      padding: 0.55rem 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.12);
+      z-index: 30;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .profile-sso-bar:hover {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.16);
+    }
+
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .profile-avatar-wrap {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #3b82f6;
+      background: #f1f5f9;
+      flex-shrink: 0;
+    }
+
+    .profile-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-text h4 {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #3b82f6;
+    }
+
+    .profile-text h3 {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .sso-switch-btn {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #1e293b;
+      padding: 0.35rem 0.7rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sso-switch-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #ffffff;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 0.5rem;
+      z-index: 25;
+    }
+
+    .nav-tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: #94a3b8;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 0.2s;
+      flex: 1;
+      height: 100%;
+    }
+
+    .nav-tab-item.active {
+      color: #2563eb;
+    }
+
+    .nav-tab-icon {
+      font-size: 1.15rem;
+    }
+
+    /* Modal / SSO Handshake Simulation Overlay */
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 360px;
+      border-radius: 24px;
+      padding: 1.75rem 1.4rem;
+      text-align: center;
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .modal-backdrop.open .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .sso-badge-pulse {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #ecfdf5;
+      color: #059669;
+      padding: 0.4rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      border: 1px solid #a7f3d0;
+    }
+
+    .modal-app-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      box-shadow: 0 10px 25px -4px rgba(0,0,0,0.15);
+    }
+
+    .modal-card h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.4rem;
+    }
+
+    .modal-card p {
+      font-size: 0.82rem;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .sso-token-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.75rem;
+      text-align: left;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: #334155;
+      margin-bottom: 1.25rem;
+      word-break: break-all;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .btn-enter-app {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-enter-app:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      padding: 0.65rem;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    /* Role Switcher Drawer */
+    .role-drawer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-radius: 28px 28px 0 0;
+      padding: 1.5rem 1.25rem 2rem;
+      z-index: 60;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
+    }
+
+    .role-drawer.open {
+      transform: translateY(0);
+    }
+
+    .drawer-handle {
+      width: 40px;
+      height: 4px;
+      background: #cbd5e1;
+      border-radius: 9999px;
+      margin: 0 auto 1.2rem;
+    }
+
+    .drawer-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.3rem;
+    }
+
+    .drawer-sub {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-bottom: 1.25rem;
+    }
+
+    .role-option-card {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .role-option-card:hover {
+      border-color: #3b82f6;
+      background: #f8fafc;
+    }
+
+    .role-option-card.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .role-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .role-info h4 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .role-info p {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    .role-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      margin-left: auto;
+    }
+
+    .badge-admin { background: #fee2e2; color: #991b1b; }
+    .badge-guru  { background: #dbeafe; color: #1e40af; }
+    .badge-siswa { background: #dcfce7; color: #166534; }
+
+    /* Interactive Sub-App Screen View */
+    .subapp-view {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ffffff;
+      z-index: 45;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .subapp-view.open {
+      transform: translateX(0);
+    }
+
+    .subapp-topbar {
+      padding: 0.9rem 1.2rem;
+      background: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .subapp-back-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .subapp-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .subapp-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Explainer & View Toggle -->
+  <div class="top-explainer-bar">
+    <div class="explainer-info">
+      <h1>🏫 Prototipe Mall SIM - Single Sign-On (SSO) Satu Pintu</h1>
+      <p>Simulasi arsitektur satu pintu: Login 1 kali di portal utama, otomatis dapat mengakses 14 layanan sekolah/institusi tanpa password berulang.</p>
+    </div>
+    <div class="view-mode-toggle">
+      <button class="mode-btn active" id="btn-phone-view">📱 Tampilan HP</button>
+      <button class="mode-btn" id="btn-desktop-view">💻 Tampilan Layar Penuh</button>
+    </div>
+  </div>
+
+  <!-- Device Mockup Shell -->
+  <div class="device-wrapper" id="device-wrapper">
+    <div class="device-screen">
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span>06:46</span>
+        <div class="camera-punch"></div>
+        <div class="status-icons">
+          <span>5G</span>
+          <span>📶</span>
+          <span>🔋 98%</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Main Content -->
+      <div class="screen-content" id="screen-content">
+
+        <!-- App Header with Logo & Title -->
+        <header class="app-header">
+          <div class="brand-group">
+            <svg class="brand-logo-img" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" rx="24" fill="#1e3a8a"/>
+              <path d="M50 15L20 30V55C20 72 33 87 50 92C67 87 80 72 80 55V30L50 15Z" fill="#3b82f6"/>
+              <circle cx="50" cy="50" r="18" fill="#facc15"/>
+              <path d="M50 38V62M38 50H62" stroke="#1e3a8a" stroke-width="5" stroke-linecap="round"/>
+            </svg>
+            <div class="brand-titles">
+              <h2>Mall SIM</h2>
+              <p>SMKN Mojoagung</p>
+            </div>
+          </div>
+          <div class="sso-live-badge">
+            <span class="pulse-dot"></span>
+            <span>SSO ACTIVE</span>
+          </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-bar-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="app-search" class="search-input" placeholder="Cari layanan (Perpus, E-Learning, Bank Mini)..." />
+        </div>
+
+        <!-- 14 Apps Launcher Grid Matching User Screenshot -->
+        <div class="apps-grid" id="apps-grid">
+
+          <!-- 1. Waka -->
+          <div class="app-item" data-app-id="waka" data-roles="admin,guru" data-name="Waka" data-desc="Manajemen Wakil Kepala Sekolah (Kurikulum, Kesiswaan, Sarpras & Humas)">
+            <div class="app-icon-squircle icon-waka">🎓</div>
+            <span class="app-label">Waka</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 2. UPJ -->
+          <div class="app-item" data-app-id="upj" data-roles="admin,guru" data-name="UPJ" data-desc="Unit Produksi dan Jasa (Teaching Factory & Penjualan Karya Siswa)">
+            <div class="app-icon-squircle icon-upj">🏪</div>
+            <span class="app-label">UPJ</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 3. Koperasi -->
+          <div class="app-item" data-app-id="koperasi" data-roles="admin,guru,siswa" data-name="Koperasi" data-desc="Koperasi Siswa, Kantin Digital & Pemesanan Seragam/Buku">
+            <div class="app-icon-squircle icon-koperasi">🛒</div>
+            <span class="app-label">Koperasi</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 4. Perpustakaan -->
+          <div class="app-item" data-app-id="perpus" data-roles="admin,guru,siswa" data-name="Perpustakaan" data-desc="Katalog E-Library, Peminjaman Buku Digital & Jurnal Riset">
+            <div class="app-icon-squircle icon-perpus">📖</div>
+            <span class="app-label">Perpustakaan</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 5. BKK -->
+          <div class="app-item" data-app-id="bkk" data-roles="admin,guru,siswa" data-name="BKK" data-desc="Bursa Kerja Khusus, Loker Industri Mitra & Penelusuran Alumni (Tracer Study)">
+            <div class="app-icon-squircle icon-bkk">🤝</div>
+            <span class="app-label">BKK</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 6. Pokja PKL -->
+          <div class="app-item" data-app-id="pkl" data-roles="admin,guru,siswa" data-name="Pokja PKL" data-desc="Praktik Kerja Lapangan: Penempatan DUDI, Absen GPS & Jurnal Harian">
+            <div class="app-icon-squircle icon-pkl">🏭</div>
+            <span class="app-label">Pokja PKL</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 7. E-Learning -->
+          <div class="app-item" data-app-id="elearning" data-roles="admin,guru,siswa" data-name="E-Learning" data-desc="LMS Pembelajaran Daring, Tugas Kelas, Video Ajar & Ujian Online">
+            <div class="app-icon-squircle icon-elearning">💻</div>
+            <span class="app-label">E-Learning</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 8. Ko-Kurikuler -->
+          <div class="app-item" data-app-id="kokurikuler" data-roles="admin,guru,siswa" data-name="Ko-Kurikuler" data-desc="Pendaftaran Ekstrakurikuler, Portofolio Lomba & Prestasi Siswa">
+            <div class="app-icon-squircle icon-kokurikuler">🏆</div>
+            <span class="app-label">Ko-Kurikuler</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 9. KaPro -->
+          <div class="app-item" data-app-id="kapro" data-roles="admin,guru" data-name="KaPro" data-desc="Kepala Program Keahlian: Kurikulum Jurusan & Uji Kompetensi Keahlian (UKK)">
+            <div class="app-icon-squircle icon-kapro">📚</div>
+            <span class="app-label">KaPro</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 10. OSIS -->
+          <div class="app-item" data-app-id="osis" data-roles="admin,guru,siswa" data-name="OSIS" data-desc="Organisasi Siswa Intra Sekolah, Voting Pemilos & Event Siswa">
+            <div class="app-icon-squircle icon-osis">🎖️</div>
+            <span class="app-label">OSIS</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 11. Kepegawaian -->
+          <div class="app-item" data-app-id="kepegawaian" data-roles="admin,guru" data-name="Kepegawaian" data-desc="Data ASN/GTT/PTT, Presensi Fingerprint, SK Mengajar & Penilaian Kinerja">
+            <div class="app-icon-squircle icon-kepegawaian">👥</div>
+            <span class="app-label">Kepegawaian</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 12. Bank Mini -->
+          <div class="app-item" data-app-id="bankmini" data-roles="admin,guru,siswa" data-name="Bank Mini" data-desc="Tabungan Siswa, Pembayaran SPP/Iuran & Literasi Finansial Perbankan">
+            <div class="app-icon-squircle icon-bankmini">🏦</div>
+            <span class="app-label">Bank Mini</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 13. Komite -->
+          <div class="app-item" data-app-id="komite" data-roles="admin" data-name="Komite" data-desc="Laporan Transparansi Komite Sekolah & Kolaborasi Orang Tua Siswa">
+            <div class="app-icon-squircle icon-komite">🤝</div>
+            <span class="app-label">Komite</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+          <!-- 14. Guru -->
+          <div class="app-item" data-app-id="guru" data-roles="admin,guru" data-name="Guru" data-desc="Perangkat Modul Ajar, Jurnal Mengajar Harian & Pengisian E-Rapor">
+            <div class="app-icon-squircle icon-guru">👩‍🏫</div>
+            <span class="app-label">Guru</span>
+            <span class="app-restricted-badge">Kunci</span>
+          </div>
+
+        </div>
+
+        <!-- Dashboard Summary Widgets -->
+        <div class="dashboard-widgets-grid">
+          <div class="widget-box">
+            <div class="widget-title">
+              <span>🕒</span>
+              <span>Recent Activity</span>
+            </div>
+            <div class="widget-item">
+              <span class="widget-badge">SSO</span>
+              <span>Login Mandiri via Portal Terpusat</span>
+            </div>
+            <div class="widget-item">
+              <span class="widget-badge">LMS</span>
+              <span>Modul Ajar Semester Genap Diunggah</span>
+            </div>
+          </div>
+
+          <div class="widget-box">
+            <div class="widget-title">
+              <span>⚡</span>
+              <span>Quick Tasks</span>
+            </div>
+            <div class="widget-item">
+              <span class="widget-badge" style="background:#fef3c7; color:#b45309;">PKL</span>
+              <span>Verifikasi Jurnal Harian 24 Siswa</span>
+            </div>
+            <div class="widget-item">
+              <span class="widget-badge" style="background:#ecfdf5; color:#047857;">Perpus</span>
+              <span>Konfirmasi Pengembalian E-Book</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Floating Profile SSO Bar (Bottom) -->
+      <div class="profile-sso-bar" id="profile-sso-bar" title="Klik untuk mengganti akun / simulasi hak akses SSO">
+        <div class="profile-left">
+          <div class="profile-avatar-wrap">
+            <img id="user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="profile-avatar-img">
+          </div>
+          <div class="profile-text">
+            <h4 id="user-role-label">Admin</h4>
+            <h3 id="user-name-label">Sudarso, S.Pd.</h3>
+          </div>
+        </div>
+        <button class="sso-switch-btn" id="btn-open-role-switch">
+          <span>Ganti Role</span>
+          <span>⇄</span>
+        </button>
+      </div>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="bottom-nav">
+        <div class="nav-tab-item active" data-tab="home">
+          <span class="nav-tab-icon">🏠</span>
+          <span>Home</span>
+        </div>
+        <div class="nav-tab-item" data-tab="reports">
+          <span class="nav-tab-icon">📊</span>
+          <span>Reports</span>
+        </div>
+        <div class="nav-tab-item" data-tab="help">
+          <span class="nav-tab-icon">❓</span>
+          <span>Help</span>
+        </div>
+        <div class="nav-tab-item" data-tab="notifications">
+          <span class="nav-tab-icon">🔔</span>
+          <span>Notifications</span>
+        </div>
+      </nav>
+
+      <!-- SSO Handshake Authentication Dialog -->
+      <div class="modal-backdrop" id="sso-modal">
+        <div class="modal-card">
+          <div class="sso-badge-pulse">
+            <span class="pulse-dot"></span>
+            <span>SINGLE SIGN-ON VERIFIED</span>
+          </div>
+          
+          <div class="modal-app-icon" id="modal-app-icon">📖</div>
+          <h3 id="modal-app-title">Perpustakaan Digital</h3>
+          <p id="modal-app-desc">Menghubungkan tiket sesi terpusat SSO tanpa perlu login ulang...</p>
+
+          <div class="sso-token-box" id="modal-sso-token">
+            Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...<br>
+            User: Sudarso, S.Pd. | Role: Admin
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-enter-app" id="btn-enter-subapp">Buka Aplikasi Sekarang 🚀</button>
+            <button class="btn-cancel" id="btn-close-modal">Batal</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Sub-App Screen View -->
+      <div class="subapp-view" id="subapp-view">
+        <div class="subapp-topbar">
+          <button class="subapp-back-btn" id="btn-subapp-back">←</button>
+          <div class="subapp-title-group">
+            <span id="subapp-header-icon" style="font-size:1.4rem;">📖</span>
+            <strong id="subapp-header-title">Perpustakaan Digital</strong>
+          </div>
+          <span class="sso-live-badge" style="font-size:0.65rem;">SSO VALID</span>
+        </div>
+        <div class="subapp-body" id="subapp-body-content">
+          <!-- Dynamically populated subapp preview content -->
+        </div>
+      </div>
+
+      <!-- Role Switcher Bottom Drawer -->
+      <div class="role-drawer" id="role-drawer">
+        <div class="drawer-handle"></div>
+        <h3 class="drawer-title">Simulasi Single Sign-On (SSO)</h3>
+        <p class="drawer-sub">Pilih akun pengguna untuk melihat bagaimana portal menyesuaikan hak akses (RBAC) secara otomatis:</p>
+
+        <!-- Admin -->
+        <div class="role-option-card active" data-role="admin" data-name="Sudarso, S.Pd." data-avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Admin" class="role-avatar">
+          <div class="role-info">
+            <h4>Sudarso, S.Pd.</h4>
+            <p>Admin Sistem (14 Modul Terbuka Penuh)</p>
+          </div>
+          <span class="role-badge badge-admin">ADMIN</span>
+        </div>
+
+        <!-- Guru -->
+        <div class="role-option-card" data-role="guru" data-name="Dra. Nurul Hidayati" data-avatar="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80" alt="Guru" class="role-avatar">
+          <div class="role-info">
+            <h4>Dra. Nurul Hidayati</h4>
+            <p>Guru Pengajar (Akses Modul Akademik & Guru)</p>
+          </div>
+          <span class="role-badge badge-guru">GURU</span>
+        </div>
+
+        <!-- Siswa -->
+        <div class="role-option-card" data-role="siswa" data-name="Rizky Aditya (XII RPL 1)" data-avatar="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80">
+          <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80" alt="Siswa" class="role-avatar">
+          <div class="role-info">
+            <h4>Rizky Aditya</h4>
+            <p>Siswa (Hanya Modul Siswa & Pembelajaran)</p>
+          </div>
+          <span class="role-badge badge-siswa">SISWA</span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // State SSO Session
+    let currentUser = {
+      role: 'admin',
+      name: 'Sudarso, S.Pd.',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80'
+    };
+
+    let activeSelectedApp = null;
+
+    // Elements
+    const userRoleLabel = document.getElementById('user-role-label');
+    const userNameLabel = document.getElementById('user-name-label');
+    const userAvatar = document.getElementById('user-avatar');
+    const appsGrid = document.getElementById('apps-grid');
+    const appSearch = document.getElementById('app-search');
+    const ssoModal = document.getElementById('sso-modal');
+    const roleDrawer = document.getElementById('role-drawer');
+    const profileSsoBar = document.getElementById('profile-sso-bar');
+    const subappView = document.getElementById('subapp-view');
+
+    // Filter RBAC Based on Active Role
+    function updateRoleUI() {
+      userRoleLabel.textContent = currentUser.role.toUpperCase();
+      userNameLabel.textContent = currentUser.name;
+      userAvatar.src = currentUser.avatar;
+
+      const appCards = document.querySelectorAll('.app-item');
+      appCards.forEach(card => {
+        const allowedRoles = card.getAttribute('data-roles').split(',');
+        if (allowedRoles.includes(currentUser.role)) {
+          card.classList.remove('disabled');
+        } else {
+          card.classList.add('disabled');
+        }
+      });
+    }
+
+    // Initialize UI
+    updateRoleUI();
+
+    // App Search Filter
+    appSearch.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('.app-item').forEach(card => {
+        const name = card.getAttribute('data-name').toLowerCase();
+        const desc = card.getAttribute('data-desc').toLowerCase();
+        if (name.includes(q) || desc.includes(q)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+
+    // App Card Click -> Open SSO Handshake Modal
+    document.querySelectorAll('.app-item').forEach(card => {
+      card.addEventListener('click', () => {
+        if (card.classList.contains('disabled')) {
+          alert(`⛔ Akses Terbatas!\nModul '${card.getAttribute('data-name')}' hanya dapat dibuka oleh peran yang berwenang. Akun aktif saat ini: ${currentUser.role.toUpperCase()} (${currentUser.name}).`);
+          return;
+        }
+
+        const appId = card.getAttribute('data-app-id');
+        const appName = card.getAttribute('data-name');
+        const appDesc = card.getAttribute('data-desc');
+        const appIcon = card.querySelector('.app-icon-squircle').textContent;
+        const iconClasses = card.querySelector('.app-icon-squircle').className;
+
+        activeSelectedApp = { id: appId, name: appName, desc: appDesc, icon: appIcon, class: iconClasses };
+
+        document.getElementById('modal-app-title').textContent = appName;
+        document.getElementById('modal-app-desc').textContent = appDesc;
+        const modalIconEl = document.getElementById('modal-app-icon');
+        modalIconEl.textContent = appIcon;
+        modalIconEl.className = 'modal-app-icon ' + iconClasses.replace('app-icon-squircle', '');
+
+        // Simulated JWT Payload
+        const fakeToken = btoa(JSON.stringify({
+          sub: currentUser.name,
+          role: currentUser.role,
+          app: appId,
+          iat: Date.now(),
+          exp: Date.now() + 3600000,
+          issuer: 'SSO-SMKN-Mojoagung'
+        }));
+
+        document.getElementById('modal-sso-token').innerHTML = `
+          <strong>🔐 SSO Handshake Token (JWT):</strong><br>
+          <span style="color:#0284c7;">${fakeToken.substring(0, 36)}...</span><br>
+          <span style="color:#059669;">✓ Status: Sesi Aktif Tanpa Password</span><br>
+          <span>👤 ${currentUser.name} | [${currentUser.role.toUpperCase()}]</span>
+        `;
+
+        ssoModal.classList.add('open');
+      });
+    });
+
+    // Close Modal
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+      ssoModal.classList.remove('open');
+    });
+
+    ssoModal.addEventListener('click', (e) => {
+      if (e.target === ssoModal) {
+        ssoModal.classList.remove('open');
+      }
+    });
+
+    // Enter Sub-App Simulation
+    document.getElementById('btn-enter-subapp').addEventListener('click', () => {
+      ssoModal.classList.remove('open');
+      launchSubAppView(activeSelectedApp);
+    });
+
+    function launchSubAppView(app) {
+      document.getElementById('subapp-header-icon').textContent = app.icon;
+      document.getElementById('subapp-header-title').textContent = app.name;
+
+      const bodyEl = document.getElementById('subapp-body-content');
+      bodyEl.innerHTML = `
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:1.25rem; margin-bottom:1.25rem;">
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+            <div style="font-size:2rem;">${app.icon}</div>
+            <div>
+              <h3 style="font-size:1.15rem; font-weight:800; color:#0f172a;">Layanan ${app.name}</h3>
+              <p style="font-size:0.78rem; color:#64748b;">SMKN Mojoagung Digital Ecosystem</p>
+            </div>
+          </div>
+          <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:0.6rem 0.8rem; font-size:0.75rem; color:#065f46;">
+            <strong>✓ Terautentikasi Otomatis via SSO:</strong> Halo, <strong>${currentUser.name}</strong> (${currentUser.role.toUpperCase()}). Anda langsung masuk tanpa perlu memasukkan password lagi!
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr; gap:0.8rem;">
+          <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <h4 style="font-size:0.9rem; font-weight:700; margin-bottom:0.4rem; color:#1e3a8a;">📋 Data Layanan Terkini</h4>
+            <p style="font-size:0.8rem; color:#64748b; line-height:1.5;">${app.desc}</p>
+          </div>
+
+          <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <h4 style="font-size:0.9rem; font-weight:700; margin-bottom:0.4rem; color:#1e3a8a;">⚡ Aksi Cepat</h4>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.6rem;">
+              <button style="background:#2563eb; color:white; border:none; padding:0.5rem 0.9rem; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer;">Buka Modul Penuh</button>
+              <button style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:0.5rem 0.9rem; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer;">Unduh Laporan</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      subappView.classList.add('open');
+    }
+
+    // Sub-App Back Button
+    document.getElementById('btn-subapp-back').addEventListener('click', () => {
+      subappView.classList.remove('open');
+    });
+
+    // Open Role Switcher Drawer
+    profileSsoBar.addEventListener('click', () => {
+      roleDrawer.classList.toggle('open');
+    });
+
+    // Select Role
+    document.querySelectorAll('.role-option-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.role-option-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+
+        currentUser = {
+          role: card.getAttribute('data-role'),
+          name: card.getAttribute('data-name'),
+          avatar: card.getAttribute('data-avatar')
+        };
+
+        updateRoleUI();
+        roleDrawer.classList.remove('open');
+      });
+    });
+
+    // Close Drawer when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!roleDrawer.contains(e.target) && !profileSsoBar.contains(e.target)) {
+        roleDrawer.classList.remove('open');
+      }
+    });
+
+    // View Mode Toggle (Phone Mockup vs Desktop Fullscreen)
+    const deviceWrapper = document.getElementById('device-wrapper');
+    const btnPhoneView = document.getElementById('btn-phone-view');
+    const btnDesktopView = document.getElementById('btn-desktop-view');
+
+    btnPhoneView.addEventListener('click', () => {
+      btnPhoneView.classList.add('active');
+      btnDesktopView.classList.remove('active');
+      deviceWrapper.classList.remove('desktop-view');
+    });
+
+    btnDesktopView.addEventListener('click', () => {
+      btnDesktopView.classList.add('active');
+      btnPhoneView.classList.remove('active');
+      deviceWrapper.classList.add('desktop-view');
+    });
+
+    // Bottom Navigation Tabs
+    document.querySelectorAll('.nav-tab-item').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab-item').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const tabKey = tab.getAttribute('data-tab');
+        if (tabKey === 'reports') {
+          alert('📊 Menu Reports: Menampilkan ringkasan akses SSO dan pemakaian 14 aplikasi secara live.');
+        } else if (tabKey === 'help') {
+          alert('❓ Pusat Bantuan: Panduan Single Sign-On (SSO) SMKN Mojoagung.\nHubungi Admin IT jika akun bermasalah.');
+        } else if (tabKey === 'notifications') {
+          alert('🔔 Notifikasi SSO: Semua sistem berjalan normal, 14 aplikasi terhubung dengan aman.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
