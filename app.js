@@ -255,9 +255,14 @@ function renderWelcomeScreen(container) {
           <a class="landing-nav-link" href="#smart-pillars">${isId ? '✨ Fitur Cerdas' : '✨ Features'}</a>
           <a class="landing-nav-link" href="#role-selection">${isId ? '🎓 Akses Peran' : '🎓 Roles'}</a>
           <a class="landing-nav-link" href="#campuses-selection">${isId ? '🏛️ Kampus' : '🏛️ Campuses'}</a>
+          <a class="landing-nav-link" href="javascript:void(0)" id="landing-nav-sso-link" style="color:#2563eb; font-weight:800;">${isId ? '🗂️ Layanan 1 Pintu (SSO)' : '🗂️ 1-Door SSO Portal'}</a>
         </div>
 
         <div class="landing-nav-actions">
+          <button class="landing-sso-portal-btn" id="landing-sso-portal-trigger" title="${isId ? 'Buka Portal Layanan 1 Pintu (Single Sign-On)' : 'Open 1-Door SSO Portal'}">
+            <span>🗂️</span>
+            <span>${isId ? 'Portal 1 Pintu' : 'SSO Portal'}</span>
+          </button>
           <div class="landing-lang-toggle">
             <button class="landing-lang-btn ${state.lang === 'en' ? 'active' : ''}" id="welcome-en-btn">EN</button>
             <button class="landing-lang-btn ${state.lang === 'id' ? 'active' : ''}" id="welcome-id-btn">ID</button>
@@ -336,6 +341,9 @@ function renderWelcomeScreen(container) {
             <a href="#bali-showcase" class="hero-btn-primary">
               🌴 ${t('hero_explore_bali')}
             </a>
+            <button class="hero-btn-secondary" id="hero-sso-launcher-btn" style="background:rgba(255,255,255,0.92); color:#1e3a8a; border:1px solid #bfdbfe;">
+              🗂️ ${isId ? 'Portal 1 Pintu (SSO)' : '1-Door SSO Portal'}
+            </button>
             <button class="hero-btn-secondary" id="hero-start-btn">
               🚀 ${t('hero_start_learning')}
             </button>
@@ -903,12 +911,25 @@ function renderWelcomeScreen(container) {
     });
   }
 
-  const idBtn = document.getElementById('welcome-id-btn');
-  if (idBtn) {
-    idBtn.addEventListener('click', () => {
-      state.lang = 'id';
-      saveState();
-      renderWelcomeScreen(container);
+  // L. SSO Portal Triggers
+  const ssoNavBtn = document.getElementById('landing-sso-portal-trigger');
+  if (ssoNavBtn) {
+    ssoNavBtn.addEventListener('click', () => {
+      openSSOPortal();
+    });
+  }
+
+  const ssoNavLink = document.getElementById('landing-nav-sso-link');
+  if (ssoNavLink) {
+    ssoNavLink.addEventListener('click', () => {
+      openSSOPortal();
+    });
+  }
+
+  const ssoHeroBtn = document.getElementById('hero-sso-launcher-btn');
+  if (ssoHeroBtn) {
+    ssoHeroBtn.addEventListener('click', () => {
+      openSSOPortal();
     });
   }
 }
@@ -951,6 +972,12 @@ function renderNavbar() {
         <button class="role-btn ${state.lang === 'en' ? 'active' : ''}" id="lang-en-btn">EN</button>
         <button class="role-btn ${state.lang === 'id' ? 'active' : ''}" id="lang-id-btn">ID</button>
       </div>
+
+      <!-- SSO 1-Door Portal Launcher Button -->
+      <button class="sso-launcher-btn" id="sso-launcher-trigger" title="${state.lang === 'id' ? 'Buka Portal Layanan 1 Pintu (Single Sign-On)' : 'Open 1-Door SSO Portal'}">
+        <span class="sso-grid-icon">🗂️</span>
+        <span>${state.lang === 'id' ? 'Portal 1 Pintu' : 'SSO Portal'}</span>
+      </button>
 
       <button class="role-btn" id="logout-btn" style="background:#e2e8f0; color:#475569; padding: 0.4rem 0.8rem;">${t('logout')}</button>
     </div>
@@ -1022,6 +1049,13 @@ function renderNavbar() {
     saveState();
     render();
   });
+
+  const ssoTrigger = document.getElementById('sso-launcher-trigger');
+  if (ssoTrigger) {
+    ssoTrigger.addEventListener('click', () => {
+      openSSOPortal();
+    });
+  }
 }
 
 function renderTabs() {
@@ -3001,4 +3035,428 @@ function renderAnalytics(container) {
       alert("CSV data copied to clipboard!\nFormat:\nDestination,Author,Role,Comment,Likes");
     });
   });
+}
+
+// =============================================================
+// SINGLE SIGN-ON (SSO) & PORTAL LAYANAN 1 PINTU
+// =============================================================
+
+const SSO_USERS = {
+  student: {
+    name: 'Ahmad Fauzi',
+    title: 'Mahasiswa Manajemen Kepariwisataan • Poltekpar Bali',
+    roleLabel: 'MAHASISWA',
+    avatarText: 'AF',
+    color: '#3b82f6'
+  },
+  lecturer: {
+    name: 'Dr. I Made Wardana, M.Par',
+    title: 'Dosen Perencanaan Pariwisata • Poltekpar Bali',
+    roleLabel: 'DOSEN',
+    avatarText: 'MW',
+    color: '#059669'
+  },
+  coordinator: {
+    name: 'Siti Nurhaliza, S.Tr.Par',
+    title: 'Koordinator Tur Lapangan & Akreditasi Kemenparekraf',
+    roleLabel: 'KOORDINATOR',
+    avatarText: 'SN',
+    color: '#f97316'
+  }
+};
+
+const SSO_MODULES = [
+  {
+    id: '360',
+    title: 'Tur Virtual 360° VR',
+    desc: 'Panorama 360° resolusi tinggi & suara alam Bali',
+    icon: '🕶️',
+    gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+    roles: ['student', 'lecturer', 'coordinator']
+  },
+  {
+    id: 'routes',
+    title: 'Peta Rute & Lalu Lintas',
+    desc: 'Simulasi rute Google Maps, info macet & multi-modal',
+    icon: '🚦',
+    gradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+    roles: ['student', 'lecturer', 'coordinator']
+  },
+  {
+    id: 'audio',
+    title: 'Audio Guide Lapangan',
+    desc: 'Narasi kurator dwibahasa untuk observasi mandiri',
+    icon: '🎧',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    roles: ['student', 'lecturer']
+  },
+  {
+    id: 'classroom',
+    title: 'Kelas Virtual & Materi',
+    desc: 'LMS modul ajar digital, handouts & briefing dosen',
+    icon: '🏫',
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    roles: ['student', 'lecturer', 'coordinator']
+  },
+  {
+    id: 'tasks',
+    title: 'Jurnal Riset Lapangan',
+    desc: 'Pengumpulan laporan observasi & refleksi mahasiswa',
+    icon: '📝',
+    gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
+    roles: ['student', 'lecturer', 'coordinator']
+  },
+  {
+    id: 'rubrics',
+    title: 'Rubrik Evaluasi Dosen',
+    desc: 'Instrumen penilaian objektif terstandar Kemenparekraf',
+    icon: '⚖️',
+    gradient: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+    roles: ['lecturer', 'coordinator']
+  },
+  {
+    id: 'planner',
+    title: 'Kesiapan Tur 3-Fase',
+    desc: 'Checklist persiapan pra-tur, survei fisik & refleksi',
+    icon: '📋',
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    roles: ['lecturer', 'coordinator']
+  },
+  {
+    id: 'analytics',
+    title: 'Big Data & Analitik Riset',
+    desc: 'Sintesis semantik riset pariwisata berkelanjutan',
+    icon: '📊',
+    gradient: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
+    roles: ['lecturer', 'coordinator']
+  },
+  {
+    id: 'campuses',
+    title: 'Jaringan 6 Poltekpar',
+    desc: 'Ekosistem Politeknik Pariwisata se-Indonesia',
+    icon: '🏛️',
+    gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+    roles: ['student', 'lecturer', 'coordinator']
+  },
+  {
+    id: 'cert',
+    title: 'E-Sertifikat Kelulusan',
+    desc: 'Validasi kelulusan & sertifikat kompetensi tur lapangan',
+    icon: '📜',
+    gradient: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+    roles: ['student', 'lecturer', 'coordinator']
+  },
+  {
+    id: 'forum',
+    title: 'Forum Diskusi Ilmiah',
+    desc: 'Ruang tanya jawab interaktif mahasiswa & pembimbing',
+    icon: '💬',
+    gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+    roles: ['student', 'lecturer', 'coordinator']
+  },
+  {
+    id: 'database',
+    title: 'Cloud Database Sync',
+    desc: 'Sinkronisasi data real-time Supabase Database',
+    icon: '⚡',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+    roles: ['student', 'lecturer', 'coordinator']
+  }
+];
+
+function ensureSSOElements() {
+  if (document.getElementById('sso-portal-overlay')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'sso-portal-overlay';
+  overlay.className = 'sso-portal-overlay';
+  overlay.innerHTML = `
+    <div class="sso-portal-container" id="sso-portal-container">
+      
+      <!-- SSO Header -->
+      <div class="sso-portal-header">
+        <div class="sso-header-left">
+          <div class="sso-brand-icon">🌋</div>
+          <div class="sso-brand-titles">
+            <h2>Portal Layanan 1 Pintu (SSO)</h2>
+            <p>Ekosistem Digital Terpadu Politeknik Pariwisata Indonesia • Kemenparekraf RI</p>
+          </div>
+        </div>
+        <button class="sso-close-btn" id="sso-portal-close" title="Tutup">✕</button>
+      </div>
+
+      <!-- SSO Active User Session Bar -->
+      <div class="sso-user-banner" id="sso-user-banner"></div>
+
+      <!-- SSO Body -->
+      <div class="sso-portal-body">
+        
+        <!-- Search bar inside launcher -->
+        <div class="sso-search-box">
+          <span class="sso-search-icon">🔍</span>
+          <input type="text" id="sso-module-search" placeholder="Cari layanan (360, Rute, Jurnal Riset, LMS, Rubrik)..." />
+        </div>
+
+        <!-- 12 Modules Grid -->
+        <div class="sso-apps-grid" id="sso-apps-grid"></div>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Close handlers
+  document.getElementById('sso-portal-close').addEventListener('click', closeSSOPortal);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeSSOPortal();
+  });
+
+  // Search input handler
+  document.getElementById('sso-module-search').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    document.querySelectorAll('.sso-app-card').forEach(card => {
+      const title = card.getAttribute('data-title').toLowerCase();
+      const desc = card.getAttribute('data-desc').toLowerCase();
+      if (title.includes(q) || desc.includes(q)) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+}
+
+function updateSSOUserBanner() {
+  const banner = document.getElementById('sso-user-banner');
+  if (!banner) return;
+
+  const currentRole = state.activeRole || 'student';
+  const user = SSO_USERS[currentRole] || SSO_USERS.student;
+
+  banner.innerHTML = `
+    <div class="sso-user-info">
+      <div class="sso-avatar" style="background:${user.color};">${user.avatarText}</div>
+      <div class="sso-user-details">
+        <h4>
+          <span>${user.name}</span>
+          <span class="sso-verified-tag">✓ SSO ACTIVE</span>
+        </h4>
+        <p>${user.title}</p>
+      </div>
+    </div>
+
+    <div class="sso-role-switchers">
+      <span style="font-size:0.7rem; font-weight:800; color:#64748b; margin-right:4px;">SIMULASI ROLE:</span>
+      <button class="sso-role-chip ${currentRole === 'student' ? 'active' : ''}" data-sso-role="student">🎓 Mahasiswa</button>
+      <button class="sso-role-chip ${currentRole === 'lecturer' ? 'active' : ''}" data-sso-role="lecturer">👨‍🏫 Dosen</button>
+      <button class="sso-role-chip ${currentRole === 'coordinator' ? 'active' : ''}" data-sso-role="coordinator">📋 Koordinator</button>
+    </div>
+  `;
+
+  banner.querySelectorAll('.sso-role-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const targetRole = chip.getAttribute('data-sso-role');
+      state.activeRole = targetRole;
+      saveState();
+      updateSSOUserBanner();
+      renderSSOModules();
+      showSSOToast('🔄 Akun SSO Dialihkan ke: ' + SSO_USERS[targetRole].name + ' (' + SSO_USERS[targetRole].roleLabel + ')');
+      
+      const roleBtns = document.querySelectorAll('.role-tag-container button[data-role]');
+      roleBtns.forEach(b => {
+        if (b.dataset.role === targetRole) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+    });
+  });
+}
+
+function renderSSOModules() {
+  const grid = document.getElementById('sso-apps-grid');
+  if (!grid) return;
+
+  const currentRole = state.activeRole || 'student';
+
+  grid.innerHTML = SSO_MODULES.map(mod => {
+    const isAllowed = mod.roles.includes(currentRole);
+    return `
+      <div class="sso-app-card ${isAllowed ? '' : 'disabled'}" data-mod-id="${mod.id}" data-title="${mod.title}" data-desc="${mod.desc}">
+        ${!isAllowed ? `<span class="sso-card-role-tag" style="background:#fee2e2; color:#b91c1c;">TERBATAS</span>` : ''}
+        <div class="sso-app-icon-wrap" style="background:${mod.gradient}; color:#ffffff;">
+          ${mod.icon}
+        </div>
+        <div class="sso-app-title">${mod.title}</div>
+        <div class="sso-app-sub">${mod.desc}</div>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('.sso-app-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const modId = card.getAttribute('data-mod-id');
+      const mod = SSO_MODULES.find(m => m.id === modId);
+      if (!mod) return;
+
+      const isAllowed = mod.roles.includes(state.activeRole || 'student');
+      if (!isAllowed) {
+        alert('⛔ Akses Dibatasi:\nModul "' + mod.title + '" hanya dapat diakses oleh peran: ' + mod.roles.join(', ').toUpperCase() + '.\n\nAnda saat ini login sebagai: ' + (state.activeRole || 'student').toUpperCase() + '.\nSilakan gunakan tombol pengalih peran (Simulasi Role) di atas untuk menguji otorisasi SSO!');
+        return;
+      }
+
+      handleSSOLaunch(mod);
+    });
+  });
+}
+
+function openSSOPortal() {
+  ensureSSOElements();
+  updateSSOUserBanner();
+  renderSSOModules();
+
+  const overlay = document.getElementById('sso-portal-overlay');
+  if (overlay) {
+    overlay.classList.add('open');
+  }
+}
+
+function closeSSOPortal() {
+  const overlay = document.getElementById('sso-portal-overlay');
+  if (overlay) {
+    overlay.classList.remove('open');
+  }
+}
+
+function handleSSOLaunch(mod) {
+  const user = SSO_USERS[state.activeRole || 'student'] || SSO_USERS.student;
+  showSSOToast('🔐 Sesi SSO Diverifikasi! Masuk ke ' + mod.title + ' sebagai ' + user.name);
+
+  closeSSOPortal();
+
+  setTimeout(() => {
+    switch (mod.id) {
+      case '360':
+        state.isWelcome = false;
+        state.activeView = 'explorer';
+        saveState();
+        render();
+        setTimeout(() => {
+          const panoBadge = document.querySelector('.pano-badge') || document.querySelector('.bali-btn-360');
+          if (panoBadge) panoBadge.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+        break;
+
+      case 'routes':
+        state.isWelcome = false;
+        state.activeView = 'explorer';
+        saveState();
+        render();
+        break;
+
+      case 'audio':
+        state.isWelcome = false;
+        state.activeView = 'explorer';
+        saveState();
+        render();
+        setTimeout(() => {
+          const aBtn = document.getElementById('play-audio-btn');
+          if (aBtn) aBtn.click();
+        }, 350);
+        break;
+
+      case 'classroom':
+        state.isWelcome = false;
+        state.activeView = 'classroom';
+        saveState();
+        render();
+        break;
+
+      case 'tasks':
+        state.isWelcome = false;
+        state.activeView = 'activities';
+        saveState();
+        render();
+        break;
+
+      case 'rubrics':
+        state.isWelcome = false;
+        state.activeRole = 'lecturer';
+        state.activeView = 'activities';
+        saveState();
+        render();
+        break;
+
+      case 'planner':
+        state.isWelcome = false;
+        state.activeView = 'planner';
+        saveState();
+        render();
+        break;
+
+      case 'analytics':
+        state.isWelcome = false;
+        state.activeView = 'analytics';
+        saveState();
+        render();
+        break;
+
+      case 'campuses':
+        if (state.isWelcome) {
+          document.getElementById('campuses-selection')?.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          state.isWelcome = true;
+          saveState();
+          render();
+          setTimeout(() => {
+            document.getElementById('campuses-selection')?.scrollIntoView({ behavior: 'smooth' });
+          }, 200);
+        }
+        break;
+
+      case 'cert':
+        alert('📜 E-Sertifikat Terverifikasi:\nSertifikat Kompetensi Edutourism Lapangan atas nama "' + user.name + '" berstatus VALID dan terdaftar di pangkalan data Kemenparekraf RI.');
+        break;
+
+      case 'forum':
+        state.isWelcome = false;
+        state.activeView = 'classroom';
+        saveState();
+        render();
+        setTimeout(() => {
+          const commentBox = document.getElementById('class-comment-input');
+          if (commentBox) {
+            commentBox.scrollIntoView({ behavior: 'smooth' });
+            commentBox.focus();
+          }
+        }, 300);
+        break;
+
+      case 'database':
+        alert('⚡ Status Sinkronisasi Supabase Database:\nKoneksi Cloud Database berstatus ONLINE & AKTIF (100%). Sesi Single Sign-On pengguna ' + user.name + ' terhubung terenkripsi.');
+        break;
+
+      default:
+        state.isWelcome = false;
+        saveState();
+        render();
+    }
+  }, 250);
+}
+
+function showSSOToast(message) {
+  let toast = document.getElementById('sso-toast-alert');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'sso-toast-alert';
+    toast.className = 'sso-toast-alert';
+    document.body.appendChild(toast);
+  }
+
+  toast.innerHTML = `<span class="sso-toast-icon">⚡</span><span>${message}</span>`;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3500);
 }

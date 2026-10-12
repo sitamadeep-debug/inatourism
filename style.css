@@ -3321,3 +3321,436 @@ button, input, select, textarea {
   }
 }
 
+/* ============================================================= */
+/* SINGLE SIGN-ON (SSO) & PORTAL LAYANAN 1 PINTU LAUNCHER        */
+/* ============================================================= */
+
+/* Navbar SSO Launcher Trigger Button */
+.sso-launcher-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  color: #f8fafc;
+  border: 1.5px solid rgba(191, 219, 254, 0.4);
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sso-launcher-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  border-color: #60a5fa;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+.sso-grid-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.landing-sso-portal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1e3a8a;
+  border: 1.5px solid #bfdbfe;
+  padding: 0.45rem 0.95rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.landing-sso-portal-btn:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* SSO Portal Modal / Drawer Overlay */
+.sso-portal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sso-portal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sso-portal-container {
+  width: 100%;
+  max-width: 880px;
+  max-height: 90vh;
+  background-color: #faf7f2;
+  background-image: 
+    radial-gradient(circle at 10% 10%, rgba(249, 115, 22, 0.04) 0%, transparent 45%),
+    radial-gradient(circle at 90% 90%, rgba(46, 139, 124, 0.04) 0%, transparent 45%),
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c2593f' fill-opacity='0.02' fill-rule='evenodd'%3E%3Cpath d='M40 0c6 10 14 14 24 14-10 6-14 14-14 26-6-10-14-14-24-14 10-6 14-14 14-26z'/%3E%3C/g%3E%3C/svg%3E");
+  border-radius: 28px;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(24px) scale(0.96);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sso-portal-overlay.open .sso-portal-container {
+  transform: translateY(0) scale(1);
+}
+
+/* SSO Header */
+.sso-portal-header {
+  padding: 1.4rem 1.75rem 1.1rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sso-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.sso-brand-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #C2593F 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 12px rgba(194, 89, 63, 0.25);
+  flex-shrink: 0;
+}
+
+.sso-brand-titles h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.sso-brand-titles p {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.sso-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sso-close-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+  transform: rotate(90deg);
+}
+
+/* SSO Active User Profile Pill */
+.sso-user-banner {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.9rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.sso-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.sso-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);
+  flex-shrink: 0;
+}
+
+.sso-user-details h4 {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sso-verified-tag {
+  background: #ecfdf5;
+  color: #059669;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid #a7f3d0;
+}
+
+.sso-user-details p {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.sso-role-switchers {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.sso-role-chip {
+  border: none;
+  background: transparent;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sso-role-chip:hover {
+  color: #0f172a;
+}
+
+.sso-role-chip.active {
+  background: #ffffff;
+  color: #1e3a8a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* SSO Scrollable Grid Body */
+.sso-portal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1.75rem 2rem;
+}
+
+.sso-search-box {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.sso-search-box input {
+  width: 100%;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 0.88rem;
+  color: #0f172a;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.sso-search-box input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.sso-search-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.95rem;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+/* Mall Apps Grid */
+.sso-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem 1rem;
+}
+
+@media (max-width: 768px) {
+  .sso-apps-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sso-apps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.sso-app-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  backdrop-filter: blur(8px);
+}
+
+.sso-app-card:hover {
+  transform: translateY(-5px);
+  border-color: #3b82f6;
+  box-shadow: 0 14px 25px -5px rgba(59, 130, 246, 0.18);
+  background: #ffffff;
+}
+
+.sso-app-card:active {
+  transform: scale(0.97);
+}
+
+.sso-app-card.disabled {
+  opacity: 0.4;
+  filter: grayscale(0.85);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.sso-app-icon-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.85rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 6px 14px -2px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  transition: transform 0.2s;
+}
+
+.sso-app-card:hover .sso-app-icon-wrap {
+  transform: scale(1.08);
+}
+
+.sso-app-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  margin-bottom: 0.3rem;
+}
+
+.sso-app-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.sso-card-role-tag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* SSO Toast Handshake Alert */
+.sso-toast-alert {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #0f172a;
+  color: #ffffff;
+  padding: 0.85rem 1.6rem;
+  border-radius: 9999px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sso-toast-alert.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.sso-toast-icon {
+  font-size: 1.25rem;
+}
+
+
