@@ -2679,9 +2679,17 @@ function renderActivities(container) {
   
   if (state.activeRole === 'student') {
     container.innerHTML = `
-      <div style="max-width:800px; margin:0 auto;">
-        <h2 style="font-size:1.8rem; margin-bottom:0.5rem;">📝 ${t('tasks')}</h2>
-        <p style="color:var(--text-muted); margin-bottom:1.5rem;">${state.lang === 'en' ? 'Review tasks associated with destination explorer coordinates.' : 'Tinjau tugas-tugas yang terkait dengan koordinat destinasi.'}</p>
+      <div style="max-width:850px; margin:0 auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h2 style="font-size:1.8rem; margin-bottom:0.25rem;">📝 ${t('tasks')}</h2>
+            <p style="color:var(--text-muted);">${state.lang === 'en' ? 'Review tasks associated with destination explorer coordinates.' : 'Tinjau tugas-tugas yang terkait dengan koordinat destinasi.'}</p>
+          </div>
+          <button class="btn-print-action" onclick="printStudentJournalReport()" title="${state.lang === 'en' ? 'Print Field Journal Report to PDF' : 'Cetak Lembar Laporan Jurnal ke format PDF'}">
+            <span>🖨️</span>
+            <span>${state.lang === 'en' ? 'Print Journal (PDF)' : 'Cetak Laporan Jurnal (PDF)'}</span>
+          </button>
+        </div>
         
         <div style="display:flex; flex-direction:column; gap:1.2rem;">
           ${poly.destinations.map(d => {
@@ -2722,8 +2730,16 @@ function renderActivities(container) {
 
     container.innerHTML = `
       <div style="max-width:850px; margin:0 auto;">
-        <h2 style="font-size:1.8rem; margin-bottom:0.5rem;">👨‍🏫 ${t('student_submissions_panel')}</h2>
-        <p style="color:var(--text-muted); margin-bottom:1.5rem;">${state.lang === 'en' ? 'Review, evaluate, and provide rubric-based grades to submitted reflections.' : 'Tinjau, evaluasi, dan berikan nilai berbasis rubrik pada refleksi yang dikirimkan.'}</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h2 style="font-size:1.8rem; margin-bottom:0.25rem;">👨‍🏫 ${t('student_submissions_panel')}</h2>
+            <p style="color:var(--text-muted);">${state.lang === 'en' ? 'Review, evaluate, and provide rubric-based grades to submitted reflections.' : 'Tinjau, evaluasi, dan berikan nilai berbasis rubrik pada refleksi yang dikirimkan.'}</p>
+          </div>
+          <button class="btn-print-action" onclick="printLecturerGradingReport()" title="${state.lang === 'en' ? 'Print Grading Minutes to PDF' : 'Cetak Berita Acara Rekap Nilai ke format PDF'}">
+            <span>🖨️</span>
+            <span>${state.lang === 'en' ? 'Print Grading (PDF)' : 'Cetak Berita Acara Nilai (PDF)'}</span>
+          </button>
+        </div>
         
         <div style="display:flex; flex-direction:column; gap:1.2rem;">
           ${submissions.length === 0 ? `
@@ -2740,7 +2756,7 @@ function renderActivities(container) {
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                   <div>
                     <h4 style="font-size:1.1rem; color:var(--poly-primary);">${getLocalized(subItem.task.title)}</h4>
-                    <p style="font-size:0.75rem; color:var(--text-muted);">Destination: ${subItem.dest.name} • Student: Budi Santoso</p>
+                    <p style="font-size:0.75rem; color:var(--text-muted);">Destination: ${subItem.dest.name} • Student: Wayan Aditya Wardana</p>
                   </div>
                   <span class="chk-category ${isGraded ? 'sustainability' : 'technology'}">
                     ${isGraded ? `${t('graded')}: ${subItem.submission.grade}/100` : t('needs_grading')}
@@ -2764,6 +2780,291 @@ function renderActivities(container) {
     `;
   }
 }
+
+// -------------------------------------------------------------
+// PRINT DOCUMENT HANDLERS (OFFICIAL ACADEMIC REPORTS)
+// -------------------------------------------------------------
+window.printStudentJournalReport = function() {
+  const poly = POLYTECHNICS[state.activePoly] || POLYTECHNICS.bali;
+  const currentRole = state.activeRole || 'student';
+  const user = SSO_USERS[currentRole] || SSO_USERS.student;
+  const dateStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  let printArea = document.getElementById('academic-print-sheet');
+  if (!printArea) {
+    printArea = document.createElement('div');
+    printArea.id = 'academic-print-sheet';
+    printArea.className = 'academic-print-sheet';
+    document.body.appendChild(printArea);
+  }
+
+  printArea.innerHTML = `
+    <div class="print-doc-container">
+      
+      <!-- Kop Surat Resmi -->
+      <div class="print-header-kop">
+        <div class="print-kop-logo">🌋</div>
+        <div class="print-kop-text">
+          <h3>KEMENTERIAN PARIWISATA DAN EKONOMI KREATIF REPUBLIK INDONESIA</h3>
+          <h4>${poly.name.toUpperCase()}</h4>
+          <p>Program Studi Sarjana Terapan Pengelolaan Perhotelan & Manajemen Kepariwisataan</p>
+          <small>Kampus Poltekpar Indonesia • Surel: akademik@kemenparekraf.go.id • Akreditasi Unggul (A)</small>
+        </div>
+      </div>
+      <div class="print-kop-divider"></div>
+
+      <!-- Judul Dokumen -->
+      <div class="print-doc-title">
+        <h2>LEMBAR LAPORAN OBSERVASI & JURNAL REFLEKSI LAPANGAN</h2>
+        <span class="print-doc-num">No. Registrasi: INA-EDUTOUR/LAP-MHS/2026/08942 • Sesi SSO: TERVERIFIKASI AKTIF</span>
+      </div>
+
+      <!-- Identitas Mahasiswa & Studi -->
+      <table class="print-meta-table">
+        <tr>
+          <td style="width:20%; font-weight:700;">Nama Mahasiswa</td>
+          <td style="width:30%;">: ${user.name}</td>
+          <td style="width:20%; font-weight:700;">Lokasi Kampus</td>
+          <td style="width:30%;">: ${poly.name}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">Nomor Induk (NIM)</td>
+          <td>: ${user.idNumber}</td>
+          <td style="font-weight:700;">Dosen Pembimbing</td>
+          <td>: Dr. I Nyoman Suartha, M.Par</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">Program Studi</td>
+          <td>: ${user.title}</td>
+          <td style="font-weight:700;">Tanggal Cetak</td>
+          <td>: ${dateStr}</td>
+        </tr>
+      </table>
+
+      <!-- Tabel Ringkasan Observasi Lapangan -->
+      <h4 style="margin: 1.2rem 0 0.4rem; font-size: 0.92rem; color: #000000; text-transform: uppercase;">A. Ringkasan Observasi Lapangan & Analisis Mahasiswa</h4>
+      <table class="print-data-table">
+        <thead>
+          <tr>
+            <th style="width:5%;">No</th>
+            <th style="width:24%;">Destinasi Edukasi</th>
+            <th style="width:51%;">Uraian Hasil Observasi & Refleksi 3-Fase</th>
+            <th style="width:20%;">Status & Nilai</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${poly.destinations.map((d, idx) => {
+            const task = d.task;
+            const sub = state.tasks[task.id];
+            const answerText = sub?.text || "Mahasiswa mengobservasi zonasi Tri Mandala, konservasi tebing karang, sistem perairan Subak ramah lingkungan, serta interaksi kearifan lokal komunitas adat.";
+            const gradeText = sub?.grade ? `${sub.grade} / 100 (A)` : "94 / 100 (A)";
+            return `
+              <tr>
+                <td style="text-align:center;">${idx + 1}</td>
+                <td>
+                  <strong>${d.name}</strong><br/>
+                  <small style="color:#475569;">${d.category || 'Cagar Budaya & Alam'}</small>
+                </td>
+                <td style="font-size:0.82rem; line-height:1.45;">
+                  <em>"${answerText}"</em>
+                </td>
+                <td style="text-align:center; font-weight:700; color:#047857;">
+                  ✓ Terverifikasi<br/>
+                  <span style="font-size:0.86rem; color:#000000;">${gradeText}</span>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+
+      <!-- Catatan Evaluasi Dosen -->
+      <div class="print-evaluation-box">
+        <strong>B. Catatan & Feedback Evaluasi Dosen Pembimbing:</strong>
+        <p>"Mahasiswa menunjukkan penguasaan teori kepariwisataan berkelanjutan yang sangat baik. Observasi geoteknik tebing dan zonasi konservasi cagar budaya sangat komprehensif serta siap dijadikan bahan kajian riset lanjutan."</p>
+      </div>
+
+      <!-- Kolom Tanda Tangan -->
+      <div class="print-signatures-grid">
+        <div class="print-sig-box">
+          <p>Mahasiswa Peneliti,</p>
+          <div class="print-sig-space"></div>
+          <strong>${user.name}</strong>
+          <p>${user.idNumber}</p>
+        </div>
+
+        <div class="print-sig-box qr-center">
+          <div class="print-qr-code">
+            <span style="font-size:2.2rem;">📱</span>
+            <small>VERIFIKASI RESMI SSO KEMENPAREKRAF</small>
+          </div>
+          <small style="color:#64748b;">Dokumen sah & terdaftar di Pangkalan Data</small>
+        </div>
+
+        <div class="print-sig-box">
+          <p>Mengetahui,<br/>Dosen Pembimbing Lapangan</p>
+          <div class="print-sig-space"></div>
+          <strong>Dr. I Nyoman Suartha, M.Par</strong>
+          <p>NIP. 197805122003121002</p>
+        </div>
+      </div>
+
+      <div class="print-footer-page">
+        INA-Edutour • Platform Edutourism Hybrid Resmi Politeknik Pariwisata Indonesia • Kementerian Pariwisata dan Ekonomi Kreatif RI
+      </div>
+
+    </div>
+  `;
+
+  window.print();
+};
+
+window.printLecturerGradingReport = function() {
+  const poly = POLYTECHNICS[state.activePoly] || POLYTECHNICS.bali;
+  const user = SSO_USERS.lecturer;
+  const dateStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  let printArea = document.getElementById('academic-print-sheet');
+  if (!printArea) {
+    printArea = document.createElement('div');
+    printArea.id = 'academic-print-sheet';
+    printArea.className = 'academic-print-sheet';
+    document.body.appendChild(printArea);
+  }
+
+  printArea.innerHTML = `
+    <div class="print-doc-container">
+      
+      <!-- Kop Surat Resmi -->
+      <div class="print-header-kop">
+        <div class="print-kop-logo">🌋</div>
+        <div class="print-kop-text">
+          <h3>KEMENTERIAN PARIWISATA DAN EKONOMI KREATIF REPUBLIK INDONESIA</h3>
+          <h4>${poly.name.toUpperCase()}</h4>
+          <p>Program Studi Sarjana Terapan Pengelolaan Perhotelan & Manajemen Kepariwisataan</p>
+          <small>Kampus Poltekpar Indonesia • Surel: akademik@kemenparekraf.go.id • Akreditasi Unggul (A)</small>
+        </div>
+      </div>
+      <div class="print-kop-divider"></div>
+
+      <!-- Judul Dokumen -->
+      <div class="print-doc-title">
+        <h2>BERITA ACARA & REKAPITULASI PENILAIAN RUBRIK LAPANGAN</h2>
+        <span class="print-doc-num">No. Dokumen: INA-EDUTOUR/BA-NILAI/2026/102 • Sesi SSO Dosen: TEROTENTIKASI</span>
+      </div>
+
+      <!-- Identitas Dosen & Kelas -->
+      <table class="print-meta-table">
+        <tr>
+          <td style="width:20%; font-weight:700;">Dosen Penguji / Penilai</td>
+          <td style="width:30%;">: ${user.name}</td>
+          <td style="width:20%; font-weight:700;">Kampus / Lokus</td>
+          <td style="width:30%;">: ${poly.name}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">Nomor Induk (NIP)</td>
+          <td>: ${user.idNumber}</td>
+          <td style="font-weight:700;">Mata Kuliah</td>
+          <td>: Perencanaan Destinasi & Studi Tur Hybrid</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">Jabatan Akademik</td>
+          <td>: ${user.title}</td>
+          <td style="font-weight:700;">Tanggal Penilaian</td>
+          <td>: ${dateStr}</td>
+        </tr>
+      </table>
+
+      <!-- Tabel Rincian Skor Rubrik -->
+      <h4 style="margin: 1.2rem 0 0.4rem; font-size: 0.92rem; color: #000000; text-transform: uppercase;">A. Rincian Penilaian Rubrik Berdasarkan Kriteria Kompetensi Kemenparekraf</h4>
+      <table class="print-data-table">
+        <thead>
+          <tr>
+            <th style="width:5%;">No</th>
+            <th style="width:35%;">Kriteria Kompetensi Rubrik</th>
+            <th style="width:15%;">Bobot</th>
+            <th style="width:15%;">Skor (0-100)</th>
+            <th style="width:30%;">Nilai Tertimbang & Catatan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align:center;">1</td>
+            <td><strong>Pemahaman Zonasi & Cagar Budaya</strong><br/><small>Zonasi Tri Mandala, konservasi suaka, batas keselamatan</small></td>
+            <td style="text-align:center;">30%</td>
+            <td style="text-align:center; font-weight:700;">95.0</td>
+            <td>28.5 (Sangat Baik / Menguasai Teori)</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">2</td>
+            <td><strong>Metodologi Observasi & Ketajaman Lapangan</strong><br/><small>Identifikasi tata ruang, interaksi komunitas CBT</small></td>
+            <td style="text-align:center;">30%</td>
+            <td style="text-align:center; font-weight:700;">92.0</td>
+            <td>27.6 (Data observasi sangat faktual)</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">3</td>
+            <td><strong>Analisis Keberlanjutan & Mitigasi Dampak</strong><br/><small>Prinsip Sapta Pesona & kelestarian lingkungan</small></td>
+            <td style="text-align:center;">25%</td>
+            <td style="text-align:center; font-weight:700;">90.0</td>
+            <td>22.5 (Solusi mitigasi aplikatif)</td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">4</td>
+            <td><strong>Refleksi Kritis & Etika Akademik</strong><br/><small>Keaslian tulisan, ketepatan waktu pengumpulan</small></td>
+            <td style="text-align:center;">15%</td>
+            <td style="text-align:center; font-weight:700;">94.0</td>
+            <td>14.1 (Etika penulisan terstandar)</td>
+          </tr>
+          <tr style="background:#f8fafc; font-weight:800;">
+            <td colspan="2" style="text-align:right;">TOTAL SKOR AKHIR:</td>
+            <td style="text-align:center;">100%</td>
+            <td style="text-align:center; color:#047857; font-size:1rem;">92.7</td>
+            <td style="color:#047857; font-size:1rem;">PREDIKAT: A (LULUS SANGAT MEMUASKAN)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Kesimpulan Berita Acara -->
+      <div class="print-evaluation-box">
+        <strong>B. Pernyataan Berita Acara Kelulusan:</strong>
+        <p>Berdasarkan evaluasi terhadap instrumen rubrik penilaian di atas, mahasiswa dinyatakan <strong>MEMENUHI SELURUH STANDAR KOMPETENSI</strong> dan berhak menerima <em>E-Sertifikat Kelulusan Riset Edutourism Lapangan</em>.</p>
+      </div>
+
+      <!-- Kolom Tanda Tangan -->
+      <div class="print-signatures-grid">
+        <div class="print-sig-box">
+          <p>Mengetahui,<br/>Koordinator Tur Lapangan</p>
+          <div class="print-sig-space"></div>
+          <strong>Siti Nurhaliza, S.Tr.Par</strong>
+          <p>NIP. 198509142010122004</p>
+        </div>
+
+        <div class="print-sig-box qr-center">
+          <div class="print-qr-code">
+            <span style="font-size:2.2rem;">📱</span>
+            <small>VERIFIKASI RESMI SSO KEMENPAREKRAF</small>
+          </div>
+          <small style="color:#64748b;">Berita Acara Resmi Pangkalan Data</small>
+        </div>
+
+        <div class="print-sig-box">
+          <p>Dosen Penguji / Penilai,</p>
+          <div class="print-sig-space"></div>
+          <strong>${user.name}</strong>
+          <p>${user.idNumber}</p>
+        </div>
+      </div>
+
+      <div class="print-footer-page">
+        INA-Edutour • Berita Acara Resmi Penilaian Studi Lapangan Politeknik Pariwisata Indonesia
+      </div>
+
+    </div>
+  `;
+
+  window.print();
+};
 
 // -------------------------------------------------------------
 // VIEW 5: TOUR PLANNER
