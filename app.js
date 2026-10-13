@@ -255,14 +255,9 @@ function renderWelcomeScreen(container) {
           <a class="landing-nav-link" href="#smart-pillars">${isId ? '✨ Fitur Cerdas' : '✨ Features'}</a>
           <a class="landing-nav-link" href="#role-selection">${isId ? '🎓 Akses Peran' : '🎓 Roles'}</a>
           <a class="landing-nav-link" href="#campuses-selection">${isId ? '🏛️ Kampus' : '🏛️ Campuses'}</a>
-          <a class="landing-nav-link" href="javascript:void(0)" id="landing-nav-sso-link" style="color:#2563eb; font-weight:800;">${isId ? '🗂️ Layanan 1 Pintu (SSO)' : '🗂️ 1-Door SSO Portal'}</a>
         </div>
 
         <div class="landing-nav-actions">
-          <button class="landing-sso-portal-btn" id="landing-sso-portal-trigger" title="${isId ? 'Buka Portal Layanan 1 Pintu (Single Sign-On)' : 'Open 1-Door SSO Portal'}">
-            <span>🗂️</span>
-            <span>${isId ? 'Portal 1 Pintu' : 'SSO Portal'}</span>
-          </button>
           <div class="landing-lang-toggle">
             <button class="landing-lang-btn ${state.lang === 'en' ? 'active' : ''}" id="welcome-en-btn">EN</button>
             <button class="landing-lang-btn ${state.lang === 'id' ? 'active' : ''}" id="welcome-id-btn">ID</button>
@@ -341,9 +336,6 @@ function renderWelcomeScreen(container) {
             <a href="#bali-showcase" class="hero-btn-primary">
               🌴 ${t('hero_explore_bali')}
             </a>
-            <button class="hero-btn-secondary" id="hero-sso-launcher-btn" style="background:rgba(255,255,255,0.92); color:#1e3a8a; border:1px solid #bfdbfe;">
-              🗂️ ${isId ? 'Portal 1 Pintu (SSO)' : '1-Door SSO Portal'}
-            </button>
             <button class="hero-btn-secondary" id="hero-start-btn">
               🚀 ${t('hero_start_learning')}
             </button>
@@ -917,32 +909,6 @@ function renderWelcomeScreen(container) {
       saveState();
       renderWelcomeScreen(container);
     });
-  }
-
-  // L. SSO Portal Triggers -> Seamlessly enters Mall SSO Hub
-  const launchSSOHubFromLanding = () => {
-    state.activeRole = state.activeRole || 'student';
-    state.activeView = 'hub';
-    state.isWelcome = false;
-    saveState();
-    initApp();
-    const user = SSO_USERS[state.activeRole] || SSO_USERS.student;
-    showSSOToast(`🔐 Sesi SSO Aktif! Selamat Datang di Portal Layanan 1 Pintu (SSO)`);
-  };
-
-  const ssoNavBtn = document.getElementById('landing-sso-portal-trigger');
-  if (ssoNavBtn) {
-    ssoNavBtn.addEventListener('click', launchSSOHubFromLanding);
-  }
-
-  const ssoNavLink = document.getElementById('landing-nav-sso-link');
-  if (ssoNavLink) {
-    ssoNavLink.addEventListener('click', launchSSOHubFromLanding);
-  }
-
-  const ssoHeroBtn = document.getElementById('hero-sso-launcher-btn');
-  if (ssoHeroBtn) {
-    ssoHeroBtn.addEventListener('click', launchSSOHubFromLanding);
   }
 }
 
