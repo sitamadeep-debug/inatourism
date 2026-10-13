@@ -951,12 +951,6 @@ function renderNavbar() {
         <button class="role-btn ${state.lang === 'id' ? 'active' : ''}" id="lang-id-btn">ID</button>
       </div>
 
-      <!-- SSO 1-Door Portal Launcher Button -->
-      <button class="sso-launcher-btn" id="sso-launcher-trigger" title="${state.lang === 'id' ? 'Buka Portal Layanan 1 Pintu (Single Sign-On)' : 'Open 1-Door SSO Portal'}">
-        <span class="sso-grid-icon">🗂️</span>
-        <span>${state.lang === 'id' ? 'Portal 1 Pintu' : 'SSO Portal'}</span>
-      </button>
-
       <button class="role-btn" id="logout-btn" style="background:#e2e8f0; color:#475569; padding: 0.4rem 0.8rem;">${t('logout')}</button>
     </div>
   `;
@@ -1027,16 +1021,6 @@ function renderNavbar() {
     saveState();
     render();
   });
-
-  const ssoTrigger = document.getElementById('sso-launcher-trigger');
-  if (ssoTrigger) {
-    ssoTrigger.addEventListener('click', () => {
-      state.activeView = 'hub';
-      saveState();
-      render();
-      showSSOToast('🏠 Menampilkan Portal Mall Layanan 1 Pintu (SSO)');
-    });
-  }
 }
 
 function renderTabs() {
