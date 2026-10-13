@@ -3753,4 +3753,1025 @@ button, input, select, textarea {
   font-size: 1.25rem;
 }
 
+/* =============================================================
+   MALL APLIKASI SINGLE SIGN-ON (SSO) HUB SCREEN STYLING
+   ============================================================= */
+
+.sso-hub-screen {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5rem 0.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 1. Profile & Session Hero Card */
+.sso-hub-profile-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  background-image: 
+    radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(37, 99, 235, 0.04) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c2593f' fill-opacity='0.02' fill-rule='evenodd'%3E%3Cpath d='M30 0c5 8 10 11 18 11-8 5-11 10-11 19-5-8-10-11-18-11 8-5 11-10 11-19z'/%3E%3C/g%3E%3C/svg%3E");
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(226, 232, 240, 0.9);
+  border-radius: 24px;
+  padding: 1.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+}
+
+.sso-hub-user-main {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.sso-hub-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.6rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  flex-shrink: 0;
+  border: 3px solid #ffffff;
+}
+
+.sso-hub-live-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 0 10px #10b981;
+}
+
+.sso-hub-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.sso-hub-badge-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.sso-badge-role {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.sso-badge-role.student {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.sso-badge-role.lecturer {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.sso-badge-role.coordinator {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.sso-badge-verified {
+  background: #f0fdf4;
+  color: #15803d;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid #bbf7d0;
+}
+
+.sso-badge-campus {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+}
+
+.sso-hub-user-name {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.sso-hub-user-sub {
+  font-size: 0.84rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.sso-hub-actions-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.8rem;
+}
+
+@media (max-width: 900px) {
+  .sso-hub-actions-box {
+    align-items: flex-start;
+    width: 100%;
+  }
+}
+
+.sso-sim-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.sso-sim-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #64748b;
+  padding-left: 0.5rem;
+  letter-spacing: 0.04em;
+}
+
+.sso-sim-buttons {
+  display: flex;
+  gap: 3px;
+}
+
+.sso-sim-btn {
+  border: none;
+  background: transparent;
+  padding: 0.4rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sso-sim-btn:hover {
+  color: #0f172a;
+}
+
+.sso-sim-btn.active {
+  background: #ffffff;
+  color: #1e3a8a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sso-hub-quick-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sso-hub-campus-btn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  padding: 0.45rem 0.9rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.sso-hub-campus-btn:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.sso-hub-logout-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #dc2626;
+  padding: 0.45rem 0.9rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.sso-hub-logout-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* 2. Notice Banner */
+.sso-hub-notice-banner {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(240, 253, 250, 0.95) 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.84rem;
+  color: #1e3a8a;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.04);
+}
+
+.sso-notice-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.sso-notice-text {
+  line-height: 1.5;
+}
+
+/* 3. Hub Toolbar */
+.sso-hub-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.sso-hub-toolbar-left h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.sso-hub-toolbar-left p {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.sso-hub-toolbar-right {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.sso-hub-filter-chips {
+  display: flex;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 3px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.sso-filter-chip {
+  border: none;
+  background: transparent;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sso-filter-chip:hover {
+  color: #0f172a;
+}
+
+.sso-filter-chip.active {
+  background: #1e3a8a;
+  color: #ffffff;
+}
+
+.sso-hub-search-box {
+  position: relative;
+  min-width: 260px;
+}
+
+.sso-hub-search-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.55rem 0.85rem 0.55rem 2.2rem;
+  font-size: 0.82rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.sso-hub-search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.sso-hub-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+/* 4. 12 Integrated App Cards Grid */
+.sso-hub-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1024px) {
+  .sso-hub-apps-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sso-hub-apps-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sso-hub-apps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sso-hub-app-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  background-image: radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.03) 0%, transparent 40%);
+  border: 1.5px solid rgba(226, 232, 240, 0.9);
+  border-radius: 20px;
+  padding: 1.35rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(8px);
+}
+
+.sso-hub-app-card:hover {
+  transform: translateY(-6px);
+  border-color: #3b82f6;
+  box-shadow: 0 16px 30px -8px rgba(59, 130, 246, 0.16);
+  background-color: #ffffff;
+}
+
+.sso-hub-app-card:active {
+  transform: scale(0.98);
+}
+
+.sso-hub-app-card.restricted-role {
+  opacity: 0.65;
+  background-color: rgba(248, 250, 252, 0.9);
+}
+
+.sso-hub-app-card.restricted-role:hover {
+  border-color: #f87171;
+  box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.12);
+}
+
+.sso-hub-card-badge-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.6rem;
+}
+
+.sso-hub-status-pill {
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
+.sso-hub-status-pill.allowed {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.sso-hub-status-pill.restricted {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.sso-hub-app-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.85rem;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: transform 0.25s;
+}
+
+.sso-hub-app-card:hover .sso-hub-app-icon {
+  transform: scale(1.08) rotate(-3deg);
+}
+
+.sso-hub-app-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.3;
+  margin-bottom: 0.4rem;
+}
+
+.sso-hub-app-desc {
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.45;
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.sso-hub-card-footer {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sso-hub-launch-action {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #2563eb;
+  transition: all 0.2s;
+}
+
+.sso-hub-app-card:hover .sso-hub-launch-action {
+  color: #1d4ed8;
+  transform: translateX(3px);
+}
+
+.sso-hub-app-card.restricted-role .sso-hub-launch-action {
+  color: #dc2626;
+}
+
+/* 5. Bottom Section Widgets Row */
+.sso-hub-widgets-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .sso-hub-widgets-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sso-hub-widget-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(226, 232, 240, 0.9);
+  border-radius: 20px;
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+.sso-widget-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 1rem;
+}
+
+.sso-widget-icon {
+  font-size: 1.25rem;
+}
+
+.sso-widget-header h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.sso-widget-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.sso-agenda-item {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed #f1f5f9;
+}
+
+.sso-agenda-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sso-agenda-date {
+  width: 44px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.35rem 0.2rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sso-agenda-date .day {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.sso-agenda-date .time {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.sso-agenda-info h5 {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.sso-agenda-info p {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.sso-agenda-tag {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.35rem;
+}
+
+.sso-agenda-tag.confirmed {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.sso-agenda-tag.live {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.sso-agenda-tag.pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.sso-status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px dashed #f1f5f9;
+}
+
+.sso-status-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sso-status-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.sso-status-val {
+  font-size: 0.8rem;
+  color: #0f172a;
+}
+
+.sso-shortcuts-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+.sso-quick-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.sso-quick-btn:hover {
+  background: #ffffff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  transform: translateX(4px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+/* =============================================================
+   CERTIFICATE & CAMPUS MODALS
+   ============================================================= */
+
+.sso-cert-overlay, .sso-campus-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 10500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.sso-cert-overlay.open, .sso-campus-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sso-cert-box {
+  width: 100%;
+  max-width: 720px;
+  background: #fefdf9;
+  border: 4px double #d97706;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
+  position: relative;
+}
+
+.sso-cert-inner {
+  border: 1.5px solid #d97706;
+  border-radius: 14px;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  position: relative;
+  background-color: #fffdfa;
+  background-image: radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.03) 0%, transparent 60%);
+}
+
+.sso-cert-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14rem;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.sso-cert-emblem {
+  font-size: 2.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.sso-cert-header h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  letter-spacing: 0.04em;
+}
+
+.sso-cert-header h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #991b1b;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.sso-cert-header .cert-subtitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.sso-cert-title-section {
+  margin: 1.75rem 0 1.25rem;
+}
+
+.sso-cert-title-section h2 {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #b45309;
+  letter-spacing: 0.02em;
+}
+
+.sso-cert-title-section .cert-num {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: #64748b;
+  font-weight: 700;
+  display: block;
+  margin-top: 4px;
+}
+
+.sso-cert-body {
+  margin-bottom: 2rem;
+}
+
+.sso-cert-body p {
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.sso-cert-recipient-name {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #0f172a;
+  text-decoration: underline;
+  text-decoration-color: #d97706;
+  text-underline-offset: 6px;
+  margin: 0.6rem 0 0.3rem;
+}
+
+.sso-cert-recipient-id {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+}
+
+.sso-cert-desc {
+  font-size: 0.86rem;
+  color: #334155;
+  line-height: 1.6;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.sso-cert-signatures {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.sig-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sig-col p {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.sig-col strong {
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.sig-stamp {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #b91c1c;
+  border: 1.5px dashed #b91c1c;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  transform: rotate(-6deg);
+  margin-bottom: 0.3rem;
+}
+
+.sso-cert-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cert-btn-print {
+  background: #1e3a8a;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.65rem 1.4rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cert-btn-print:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+.cert-btn-close {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0.65rem 1.4rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cert-btn-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+/* Campus Modal */
+.sso-campus-box {
+  width: 100%;
+  max-width: 680px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 1.75rem;
+  box-shadow: 0 25px 60px -15px rgba(0,0,0,0.3);
+}
+
+.sso-campus-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 1.25rem;
+}
+
+.sso-campus-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.sso-campus-header p {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.sso-campus-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sso-campus-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.sso-campus-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .sso-campus-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sso-campus-item {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.sso-campus-item:hover {
+  background: #ffffff;
+  border-color: #3b82f6;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+}
+
+.sso-campus-item.active {
+  background: #eff6ff;
+  border-color: #2563eb;
+}
+
+.campus-logo-wrap {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.campus-info-wrap h4 {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.campus-info-wrap p {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.campus-current-tag {
+  display: inline-block;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  margin-top: 0.4rem;
+}
+
+
 
