@@ -2792,10 +2792,29 @@ button, input, select, textarea {
     grid-template-columns: 1fr;
   }
   .navbar {
-    padding: 0 1rem;
+    padding: 0 0.85rem;
+    height: 56px;
   }
   .nav-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+  .nav-controls {
+    gap: 0.4rem;
+  }
+  .poly-indicator {
+    display: none;
+  }
+  .nav-controls .role-tag-container {
+    display: none;
+  }
+  .nav-select {
+    max-width: 135px;
+    font-size: 0.78rem;
+    padding: 0.35rem 1.4rem 0.35rem 0.5rem;
+  }
+  #logout-btn {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.74rem;
   }
 }
 
@@ -4133,14 +4152,8 @@ button, input, select, textarea {
 
 @media (max-width: 768px) {
   .sso-hub-apps-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .sso-hub-apps-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.15rem 0.4rem;
   }
 }
 
@@ -4994,6 +5007,854 @@ button, input, select, textarea {
   }
 }
 
+/* =============================================================
+   MOBILE BOTTOM NAVIGATION & ADAPTIVE APK EXPERIENCE
+   ============================================================= */
 
+/* 1. Base State: Desktop Web has bottom-nav hidden */
+.mobile-bottom-nav {
+  display: none;
+}
 
+/* 2. Desktop Floating Viewport Mode Toggle (Helper for testing) */
+.view-mode-floating-pill {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+}
 
+.view-mode-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0f172a;
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.45);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+}
+
+.view-mode-toggle-btn:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -4px rgba(0, 0, 0, 0.55);
+  border-color: #3b82f6;
+}
+
+.view-mode-toggle-btn:active {
+  transform: scale(0.96);
+}
+
+.view-mode-toggle-btn .toggle-icon {
+  font-size: 1.15rem;
+}
+
+/* 3. Mobile Bottom Navigation Bar Styles */
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px 2px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  user-select: none;
+  gap: 2px;
+  font-family: inherit;
+}
+
+.mobile-nav-item .mobile-nav-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mobile-nav-item.active {
+  color: #2563eb;
+}
+
+.mobile-nav-item.active .mobile-nav-icon {
+  transform: translateY(-2px) scale(1.1);
+}
+
+.mobile-nav-item.active .mobile-nav-label {
+  font-weight: 800;
+  color: #1d4ed8;
+}
+
+/* 4. Mobile Account Sheet Backdrop & Card */
+.mobile-account-sheet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.mobile-account-sheet-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 28px 28px 0 0;
+  padding: 1.25rem 1.4rem 2.25rem;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  position: relative;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.sheet-drag-handle {
+  width: 40px;
+  height: 5px;
+  background: #cbd5e1;
+  border-radius: 9999px;
+  margin: 0 auto 0.4rem;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  position: relative;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.sheet-user-info {
+  flex: 1;
+}
+
+.sheet-close-btn {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.sheet-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.sheet-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sheet-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+.sheet-role-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.sheet-role-btn {
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 0.65rem 0.35rem;
+  border-radius: 14px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.sheet-role-btn span {
+  font-size: 1.25rem;
+}
+
+.sheet-role-btn:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.sheet-role-btn.active {
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #1d4ed8;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+}
+
+.sheet-select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+  outline: none;
+  font-family: inherit;
+}
+
+.sheet-action-btn {
+  flex: 1;
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: inherit;
+}
+
+.sheet-action-btn.secondary {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+.sheet-action-btn.secondary:hover {
+  background: #e2e8f0;
+}
+
+.sheet-action-btn.danger {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.sheet-action-btn.danger:hover {
+  background: #fca5a5;
+  color: #b91c1c;
+}
+
+/* =============================================================
+   5. ADAPTIVE MEDIA QUERY FOR REAL MOBILE DEVICES / APK (<= 768px)
+   ============================================================= */
+@media (max-width: 768px) {
+  /* Real mobile devices don't need the floating toggle */
+  .view-mode-floating-pill {
+    display: none !important;
+  }
+
+  .tabs-bar {
+    display: none !important;
+  }
+
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 62px !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-top: 1px solid #e2e8f0 !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    padding: 0 0.4rem !important;
+    z-index: 1000 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .app-container {
+    padding-bottom: 74px !important;
+  }
+
+  .sso-hub-screen {
+    padding: 0.5rem 0.25rem 2rem !important;
+    gap: 0.9rem !important;
+  }
+
+  .sso-hub-profile-card {
+    padding: 1rem 1.15rem !important;
+    border-radius: 20px !important;
+    gap: 0.9rem !important;
+  }
+
+  .sso-hub-user-main {
+    gap: 0.9rem !important;
+    width: 100% !important;
+  }
+
+  .sso-hub-avatar {
+    width: 52px !important;
+    height: 52px !important;
+    font-size: 1.25rem !important;
+  }
+
+  .sso-hub-user-name {
+    font-size: 1.15rem !important;
+  }
+
+  .sso-hub-user-sub {
+    font-size: 0.74rem !important;
+  }
+
+  .sso-hub-actions-box {
+    width: 100% !important;
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+  }
+
+  .sso-sim-box {
+    width: 100% !important;
+    justify-content: space-between !important;
+    padding: 3px !important;
+  }
+
+  .sso-sim-buttons {
+    width: 100% !important;
+    display: flex !important;
+  }
+
+  .sso-sim-btn {
+    flex: 1 !important;
+    padding: 0.35rem 0.35rem !important;
+    font-size: 0.72rem !important;
+    text-align: center !important;
+  }
+
+  .sso-hub-quick-buttons {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .sso-hub-campus-btn,
+  .sso-hub-logout-btn {
+    flex: 1 !important;
+    justify-content: center !important;
+    font-size: 0.74rem !important;
+    padding: 0.4rem 0.5rem !important;
+  }
+
+  /* Hide verbose text banner on mobile */
+  .sso-hub-notice-banner {
+    display: none !important;
+  }
+
+  .sso-hub-toolbar {
+    padding: 0.25rem 0 !important;
+    gap: 0.75rem !important;
+  }
+
+  .sso-hub-toolbar-left h3 {
+    font-size: 1.1rem !important;
+  }
+
+  .sso-hub-toolbar-left p {
+    font-size: 0.75rem !important;
+  }
+
+  .sso-hub-toolbar-right {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+  }
+
+  .sso-hub-filter-chips {
+    width: 100% !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding: 4px !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .sso-filter-chip {
+    flex-shrink: 0 !important;
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.65rem !important;
+  }
+
+  .sso-hub-search-box {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+
+  .sso-hub-search-input {
+    font-size: 0.8rem !important;
+    padding: 0.5rem 0.75rem 0.5rem 2.2rem !important;
+  }
+
+  /* 4-column Android / Mall SIM launcher grid */
+  .sso-hub-apps-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1.15rem 0.4rem !important;
+    padding: 0.25rem 0 !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .sso-hub-app-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: center !important;
+    position: relative !important;
+    cursor: pointer !important;
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .sso-hub-app-card:hover {
+    transform: translateY(-3px) scale(1.03) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .sso-hub-app-card:active {
+    transform: scale(0.92) !important;
+  }
+
+  .sso-hub-app-icon {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+    border-radius: 18px !important;
+    font-size: 1.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 0 0.45rem 0 !important;
+    box-shadow: 0 5px 14px -2px rgba(0, 0, 0, 0.12) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
+
+  .sso-hub-app-card:hover .sso-hub-app-icon {
+    transform: scale(1.05) !important;
+  }
+
+  .sso-hub-app-title {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+    margin: 0 !important;
+    max-width: 78px !important;
+    word-break: break-word !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  .sso-hub-app-desc,
+  .sso-hub-card-footer {
+    display: none !important;
+  }
+
+  .sso-hub-card-badge-row {
+    position: absolute !important;
+    top: -3px !important;
+    right: 50% !important;
+    transform: translateX(28px) !important;
+    z-index: 2 !important;
+    margin: 0 !important;
+  }
+
+  .sso-hub-status-pill.allowed {
+    display: none !important;
+  }
+
+  .sso-hub-status-pill.restricted {
+    font-size: 0.55rem !important;
+    padding: 1px 5px !important;
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4) !important;
+  }
+
+  .sso-hub-widgets-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+  }
+
+  .sso-hub-widget-card {
+    padding: 1.1rem !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* Very compact phones (<= 380px) */
+@media (max-width: 380px) {
+  .sso-hub-apps-grid {
+    gap: 1rem 0.2rem !important;
+  }
+  .sso-hub-app-icon {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+    border-radius: 16px !important;
+    font-size: 1.55rem !important;
+  }
+  .sso-hub-app-title {
+    font-size: 0.68rem !important;
+    max-width: 68px !important;
+  }
+}
+
+/* =============================================================
+   6. SIMULATED MOBILE MODE (For testing mobile APK on wide screens)
+   ============================================================= */
+body.simulated-mobile-mode {
+  background: #090d16 !important;
+  background-image: 
+    radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%) !important;
+  padding: 1.5rem 0.5rem 4rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  min-height: 100vh !important;
+}
+
+body.simulated-mobile-mode #app {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+body.simulated-mobile-mode .app-container {
+  max-width: 414px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  background: #f8fafc !important;
+  border-radius: 42px !important;
+  border: 11px solid #1e293b !important;
+  box-shadow: 
+    0 25px 60px -10px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  min-height: 840px !important;
+  padding-bottom: 74px !important;
+}
+
+body.simulated-mobile-mode .tabs-bar {
+  display: none !important;
+}
+
+body.simulated-mobile-mode .mobile-bottom-nav {
+  display: flex !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 62px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-top: 1px solid #e2e8f0 !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  padding: 0 0.4rem !important;
+  z-index: 1000 !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.simulated-mobile-mode .navbar {
+  padding: 0 0.85rem !important;
+  height: 56px !important;
+}
+
+body.simulated-mobile-mode .nav-title {
+  font-size: 1rem !important;
+}
+
+body.simulated-mobile-mode .poly-indicator {
+  display: none !important;
+}
+
+body.simulated-mobile-mode .nav-controls .role-tag-container {
+  display: none !important;
+}
+
+body.simulated-mobile-mode .nav-select {
+  max-width: 135px !important;
+  font-size: 0.78rem !important;
+  padding: 0.35rem 1.4rem 0.35rem 0.5rem !important;
+}
+
+body.simulated-mobile-mode #logout-btn {
+  padding: 0.35rem 0.55rem !important;
+  font-size: 0.74rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-screen {
+  padding: 0.5rem 0.25rem 2rem !important;
+  gap: 0.9rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-profile-card {
+  padding: 1rem 1.15rem !important;
+  border-radius: 20px !important;
+  gap: 0.9rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-user-main {
+  gap: 0.9rem !important;
+  width: 100% !important;
+}
+
+body.simulated-mobile-mode .sso-hub-avatar {
+  width: 52px !important;
+  height: 52px !important;
+  font-size: 1.25rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-user-name {
+  font-size: 1.15rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-user-sub {
+  font-size: 0.74rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-actions-box {
+  width: 100% !important;
+  align-items: stretch !important;
+  gap: 0.6rem !important;
+}
+
+body.simulated-mobile-mode .sso-sim-box {
+  width: 100% !important;
+  justify-content: space-between !important;
+  padding: 3px !important;
+}
+
+body.simulated-mobile-mode .sso-sim-buttons {
+  width: 100% !important;
+  display: flex !important;
+}
+
+body.simulated-mobile-mode .sso-sim-btn {
+  flex: 1 !important;
+  padding: 0.35rem 0.35rem !important;
+  font-size: 0.72rem !important;
+  text-align: center !important;
+}
+
+body.simulated-mobile-mode .sso-hub-quick-buttons {
+  width: 100% !important;
+  justify-content: space-between !important;
+}
+
+body.simulated-mobile-mode .sso-hub-campus-btn,
+body.simulated-mobile-mode .sso-hub-logout-btn {
+  flex: 1 !important;
+  justify-content: center !important;
+  font-size: 0.74rem !important;
+  padding: 0.4rem 0.5rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-notice-banner {
+  display: none !important;
+}
+
+body.simulated-mobile-mode .sso-hub-toolbar {
+  padding: 0.25rem 0 !important;
+  gap: 0.75rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-toolbar-left h3 {
+  font-size: 1.1rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-toolbar-left p {
+  font-size: 0.75rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-toolbar-right {
+  width: 100% !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.6rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-filter-chips {
+  width: 100% !important;
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  padding: 4px !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+body.simulated-mobile-mode .sso-filter-chip {
+  flex-shrink: 0 !important;
+  font-size: 0.72rem !important;
+  padding: 0.35rem 0.65rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-search-box {
+  width: 100% !important;
+  min-width: unset !important;
+}
+
+body.simulated-mobile-mode .sso-hub-search-input {
+  font-size: 0.8rem !important;
+  padding: 0.5rem 0.75rem 0.5rem 2.2rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-apps-grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1.15rem 0.4rem !important;
+  padding: 0.25rem 0 !important;
+  margin-bottom: 1.25rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-app-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: center !important;
+  position: relative !important;
+  cursor: pointer !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.simulated-mobile-mode .sso-hub-app-card:hover {
+  transform: translateY(-3px) scale(1.03) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.simulated-mobile-mode .sso-hub-app-card:active {
+  transform: scale(0.92) !important;
+}
+
+body.simulated-mobile-mode .sso-hub-app-icon {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  min-height: 58px !important;
+  border-radius: 18px !important;
+  font-size: 1.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0 0.45rem 0 !important;
+  box-shadow: 0 5px 14px -2px rgba(0, 0, 0, 0.12) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+}
+
+body.simulated-mobile-mode .sso-hub-app-title {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  line-height: 1.25 !important;
+  text-align: center !important;
+  margin: 0 !important;
+  max-width: 78px !important;
+  word-break: break-word !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+body.simulated-mobile-mode .sso-hub-app-desc,
+body.simulated-mobile-mode .sso-hub-card-footer {
+  display: none !important;
+}
+
+body.simulated-mobile-mode .sso-hub-card-badge-row {
+  position: absolute !important;
+  top: -3px !important;
+  right: 50% !important;
+  transform: translateX(28px) !important;
+  z-index: 2 !important;
+  margin: 0 !important;
+}
+
+body.simulated-mobile-mode .sso-hub-status-pill.allowed {
+  display: none !important;
+}
+
+body.simulated-mobile-mode .sso-hub-status-pill.restricted {
+  font-size: 0.55rem !important;
+  padding: 1px 5px !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4) !important;
+}
+
+body.simulated-mobile-mode .sso-hub-widgets-row {
+  grid-template-columns: 1fr !important;
+  gap: 0.85rem !important;
+}
+
+body.simulated-mobile-mode .sso-hub-widget-card {
+  padding: 1.1rem !important;
+  border-radius: 18px !important;
+}

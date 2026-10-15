@@ -111,6 +111,7 @@ function render() {
 
   if (state.isWelcome) {
     renderWelcomeScreen(container);
+    initViewModeToggle();
     return;
   }
 
@@ -119,17 +120,22 @@ function render() {
       <!-- Navbar -->
       <header class="navbar" id="navbar-view"></header>
       
-      <!-- Tab Navigation -->
+      <!-- Tab Navigation (Desktop) -->
       <nav class="tabs-bar" id="tabs-view"></nav>
 
       <!-- Viewport -->
       <main class="content-viewport" id="content-view"></main>
+
+      <!-- Mobile Bottom Navigation (Only visible on Mobile / APK) -->
+      <nav class="mobile-bottom-nav" id="mobile-bottom-nav-view"></nav>
     </div>
   `;
 
   renderNavbar();
   renderTabs();
   renderActiveView();
+  renderMobileBottomNav();
+  initViewModeToggle();
 }
 
 // -------------------------------------------------------------
@@ -1051,6 +1057,208 @@ function renderTabs() {
       render();
     });
   });
+}
+
+// -------------------------------------------------------------
+// ADAPTIVE MOBILE BOTTOM NAVIGATION & CONTROLLERS
+// -------------------------------------------------------------
+function renderMobileBottomNav() {
+  const nav = document.getElementById('mobile-bottom-nav-view');
+  if (!nav) return;
+
+  const isId = state.lang === 'id';
+  const role = state.activeRole || 'student';
+  const currentView = state.activeView || 'hub';
+
+  // Base mobile tabs adapted by role
+  const navItems = [
+    { id: 'hub', label: isId ? 'Beranda' : 'Home', icon: '🏠', action: 'view' },
+    { id: 'explorer', label: isId ? 'Jelajah' : 'Explore', icon: '🗺️', action: 'view' },
+    { id: 'classroom', label: isId ? 'Kelas' : 'Class', icon: '🏛️', action: 'view' }
+  ];
+
+  if (role === 'coordinator') {
+    navItems.push({ id: 'planner', label: isId ? 'Kesiapan' : 'Planner', icon: '📋', action: 'view' });
+  } else if (role === 'lecturer') {
+    navItems.push({ id: 'activities', label: isId ? 'Rubrik' : 'Rubric', icon: '⚖️', action: 'view' });
+  } else {
+    navItems.push({ id: 'activities', label: isId ? 'Jurnal' : 'Journal', icon: '📝', action: 'view' });
+  }
+
+  navItems.push({ id: 'account', label: isId ? 'Akun' : 'Account', icon: '👤', action: 'account_modal' });
+
+  nav.innerHTML = navItems.map(item => {
+    const isActive = (item.action === 'view' && (currentView === item.id || (item.id === 'hub' && currentView === 'dashboard')));
+    return `
+      <button class="mobile-nav-item ${isActive ? 'active' : ''}" data-nav-id="${item.id}" data-nav-action="${item.action}">
+        <span class="mobile-nav-icon">${item.icon}</span>
+        <span class="mobile-nav-label">${item.label}</span>
+      </button>
+    `;
+  }).join('');
+
+  nav.querySelectorAll('.mobile-nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.navAction;
+      const targetId = btn.dataset.navId;
+
+      if (action === 'view') {
+        state.activeView = targetId;
+        saveState();
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (action === 'account_modal') {
+        openMobileAccountSheet();
+      }
+    });
+  });
+}
+
+function openMobileAccountSheet() {
+  const isId = state.lang === 'id';
+  const role = state.activeRole || 'student';
+  const user = SSO_USERS[role] || SSO_USERS.student;
+  const poly = POLYTECHNICS[state.activePoly] || POLYTECHNICS.bali;
+
+  const existing = document.getElementById('mobile-account-sheet');
+  if (existing) existing.remove();
+
+  const sheet = document.createElement('div');
+  sheet.id = 'mobile-account-sheet';
+  sheet.className = 'mobile-account-sheet-backdrop animate-fade';
+  sheet.innerHTML = `
+    <div class="mobile-account-sheet-card animate-slide-up">
+      <div class="sheet-drag-handle"></div>
+      
+      <div class="sheet-header">
+        <div class="sso-hub-avatar" style="background: ${user.gradient}; width:48px; height:48px; font-size:1.2rem; flex-shrink:0;">
+          ${user.avatarText}
+        </div>
+        <div class="sheet-user-info">
+          <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.2rem;">
+            <span class="sso-badge-role ${role}" style="font-size:0.65rem;">${user.roleLabel}</span>
+            <span class="sso-badge-verified" style="font-size:0.62rem;">✓ SSO LIVE</span>
+          </div>
+          <h3 style="font-size:1.05rem; font-weight:800; color:#0f172a; line-height:1.2;">${user.name}</h3>
+          <p style="font-size:0.75rem; color:#64748b;">${user.idNumber} • ${user.email}</p>
+        </div>
+        <button class="sheet-close-btn" id="close-mobile-sheet-btn">✕</button>
+      </div>
+
+      <div class="sheet-section">
+        <label class="sheet-label">⚡ ${isId ? 'SIMULASI PERAN SSO' : 'SWITCH SSO ROLE'}:</label>
+        <div class="sheet-role-options">
+          <button class="sheet-role-btn ${role === 'student' ? 'active' : ''}" data-role="student">
+            <span>🎓</span> ${isId ? 'Mahasiswa' : 'Student'}
+          </button>
+          <button class="sheet-role-btn ${role === 'lecturer' ? 'active' : ''}" data-role="lecturer">
+            <span>👨‍🏫</span> ${isId ? 'Dosen' : 'Lecturer'}
+          </button>
+          <button class="sheet-role-btn ${role === 'coordinator' ? 'active' : ''}" data-role="coordinator">
+            <span>📋</span> ${isId ? 'Koordinator' : 'Coordinator'}
+          </button>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <label class="sheet-label">🏛️ ${isId ? 'KAMPUS POLITEKNIK' : 'POLYLTECHNIC CAMPUS'}:</label>
+        <select class="sheet-select" id="sheet-poly-select">
+          ${Object.keys(POLYTECHNICS).map(k => `
+            <option value="${k}" ${state.activePoly === k ? 'selected' : ''}>${POLYTECHNICS[k].name}</option>
+          `).join('')}
+        </select>
+      </div>
+
+      <div class="sheet-section" style="display:flex; gap:0.5rem;">
+        <button class="sheet-action-btn secondary" id="sheet-lang-btn">
+          🌐 Bahasa: <strong>${state.lang.toUpperCase()}</strong>
+        </button>
+        <button class="sheet-action-btn danger" id="sheet-logout-btn">
+          🚪 ${isId ? 'Keluar Akun' : 'Logout'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(sheet);
+
+  sheet.querySelector('#close-mobile-sheet-btn').onclick = () => sheet.remove();
+  sheet.onclick = (e) => {
+    if (e.target === sheet) sheet.remove();
+  };
+
+  sheet.querySelectorAll('.sheet-role-btn').forEach(btn => {
+    btn.onclick = () => {
+      state.activeRole = btn.dataset.role;
+      saveState();
+      sheet.remove();
+      const targetUser = SSO_USERS[state.activeRole] || SSO_USERS.student;
+      showSSOToast(`🔄 Akun SSO Dialihkan ke: ${targetUser.name} (${targetUser.roleLabel})`);
+      render();
+    };
+  });
+
+  const polySel = sheet.querySelector('#sheet-poly-select');
+  if (polySel) {
+    polySel.onchange = () => {
+      state.activePoly = polySel.value;
+      saveState();
+      sheet.remove();
+      render();
+    };
+  }
+
+  const langBtn = sheet.querySelector('#sheet-lang-btn');
+  if (langBtn) {
+    langBtn.onclick = () => {
+      state.lang = state.lang === 'id' ? 'en' : 'id';
+      saveState();
+      sheet.remove();
+      render();
+    };
+  }
+
+  const logoutBtn = sheet.querySelector('#sheet-logout-btn');
+  if (logoutBtn) {
+    logoutBtn.onclick = () => {
+      sheet.remove();
+      state.isWelcome = true;
+      saveState();
+      render();
+    };
+  }
+}
+
+function initViewModeToggle() {
+  let togglePill = document.getElementById('view-mode-toggle-pill');
+  if (!togglePill) {
+    togglePill = document.createElement('div');
+    togglePill.id = 'view-mode-toggle-pill';
+    togglePill.className = 'view-mode-floating-pill';
+    document.body.appendChild(togglePill);
+  }
+
+  const isSimulated = document.body.classList.contains('simulated-mobile-mode');
+  togglePill.innerHTML = `
+    <button id="view-mode-btn" class="view-mode-toggle-btn" title="Klik untuk beralih antara Mode Web Desktop dan Simulasi Tampilan HP (APK)">
+      <span class="toggle-icon">${isSimulated ? '💻' : '📱'}</span>
+      <span class="toggle-text">${isSimulated ? 'Kembali ke Mode Web' : 'Uji Tampilan HP (APK)'}</span>
+    </button>
+  `;
+
+  const btn = togglePill.querySelector('#view-mode-btn');
+  if (btn) {
+    btn.onclick = () => {
+      document.body.classList.toggle('simulated-mobile-mode');
+      const activeNow = document.body.classList.contains('simulated-mobile-mode');
+      if (activeNow) {
+        showSSOToast('📱 Beralih ke Tampilan Mobile / APK Android (Grid 4 Kolom & Bottom Nav)');
+      } else {
+        showSSOToast('💻 Kembali ke Tampilan Web Desktop (Dashboard Lengkap)');
+      }
+      render();
+    };
+  }
 }
 
 function renderActiveView() {
