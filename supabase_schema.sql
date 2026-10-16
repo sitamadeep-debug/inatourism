@@ -2,7 +2,7 @@
 
 -- 1. Table for Destination & Classroom Discussions / Comments
 CREATE TABLE IF NOT EXISTS public.comments (
-  id UUID DEFAULT gen_random_code() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   dest_id TEXT NOT NULL,
   author TEXT NOT NULL,
   role TEXT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
 
 -- 3. Table for Coordinator Hybrid Readiness Checklists
 CREATE TABLE IF NOT EXISTS public.checklists (
-  id UUID DEFAULT gen_random_code() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   phase TEXT NOT NULL,
   item_id TEXT NOT NULL,
   checked BOOLEAN DEFAULT true,
