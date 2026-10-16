@@ -16,3 +16,7 @@ desktop.ini
 # Local Environment
 .env.local
 .env
+
+# GitHub Actions workflows (managed via GitHub UI to bypass PAT workflow scope)
+.github/
+

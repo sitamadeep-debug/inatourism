@@ -92,7 +92,30 @@ async function dbSaveTask(taskId, studentName, status, text, grade = null, feedb
   }
 }
 
+// Background Keep-Alive Ping on App Load
+async function pingSupabaseKeepAlive() {
+  const client = initSupabase();
+  if (!client) return;
+  try {
+    const { data, error } = await client.from('comments').select('id').limit(1);
+    if (!error) {
+      console.log("⚡ [Keep-Alive] Supabase database session pinged successfully");
+    }
+  } catch (err) {
+    // Non-blocking background catch
+  }
+}
+
+// Auto-trigger keep-alive ping when page finishes loading
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(pingSupabaseKeepAlive, 1500);
+  });
+}
+
 window.dbFetchComments = dbFetchComments;
 window.dbInsertComment = dbInsertComment;
 window.dbSaveTask = dbSaveTask;
 window.initSupabase = initSupabase;
+window.pingSupabaseKeepAlive = pingSupabaseKeepAlive;
+
